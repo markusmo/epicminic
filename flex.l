@@ -1,6 +1,7 @@
 %{
   #include <stdio.h>
   #include <stdlib.h>
+  #include "epic_bison.tab.h"
 %}
 
 digit [0-9]
@@ -8,17 +9,17 @@ letter [a-zA-Z]
 letter2 [a-zA-Z_]
 
 %%
-int	return INT;
-float	return FLOAT;
-while return WHILE;
-do	return DO;
-if	return IF;
-else	return ELSE;
-for	return FOR;
-return	return RETURN;
-{digit}+	{ yylval =  atoi(yyltext); return INTNUM; }
-{digit}+.{digit}+	{ yylval = atoi(yyltext); return FLOATNUM; }
-{letter}{letter2}*	{ yylval = yyltext; return ID; }
+"int"	return INT;
+"float"	return FLOAT;
+"while" return WHILE;
+"do"	return DO;
+"if"	return IF;
+"else"	return ELSE;
+"for"	return FOR;
+"return"	return RETURN;
+{digit}+	{return INTNUM; }
+{digit}+.{digit}+	{return FLOATNUM; }
+{letter}{letter2}*	{return ID; }
 "*"	return MULT;
 "/"	return DIV;
 "+"	return PLUS;
@@ -36,10 +37,6 @@ return	return RETURN;
 "}"	return RFANCYBRACKET;
 "["	return LBRACKET;
 "]"	return RBRACKET;
-";" return SEMICOLON;
-"," return COLON;
+";"	return SEMICOLON;
+","	return COLON;
 %%
-
-main() {
-	yylex();
-}
