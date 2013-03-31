@@ -22,7 +22,8 @@
 	
 	%right '=' ASSIGN
 	%left '<' '>' LE GE EQ NE LT GT
-	%right '-' '+' MINUS PLUS
+	%right '-' '+' MINUS PLUS DIV MULT
+	%right RPARENT ELSE
 %%
 	start: program
 	
