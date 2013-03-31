@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include "lex.yy.c"
 #include <ctype.h>
 
 int main(int argc, char *arg[])
