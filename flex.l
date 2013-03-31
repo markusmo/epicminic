@@ -16,9 +16,9 @@ if	return IF;
 else	return ELSE;
 for	return FOR;
 return	return RETURN;
-{digit}+	return INTNUM;
-{digit}+.{digit}+	return FLOATNUM;
-{letter}{letter2}*	return ID;
+{digit}+	{ yylval =  atoi(yyltext); return INTNUM; }
+{digit}+.{digit}+	{ yylval = atoi(yyltext); return FLOATNUM; }
+{letter}{letter2}*	{ yylval = yyltext; return ID; }
 "*"	return MULT;
 "/"	return DIV;
 "+"	return PLUS;
