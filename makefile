@@ -7,16 +7,16 @@ OBJ = epic_bison.tab.o lex.yy.o main.o
 %.o:%.c
 
 epicFrontEnd: $(OBJ) -lfl
-$(CC) -o $@ $(OBJ) -lfl
+	$(CC) -o $@ $(OBJ) -lfl
 
 $(OBJ):
-$(CC) -c $*.c $(CCFLAGS)
+	$(CC) -c $*.c $(CCFLAGS)
 
 lex.yy.c: flex.l
-$(FL) -t $<
+	$(FL) -t $<
 
 epic_bison.tab.c: epic_bison.y
-$(BI) -d $<
+	$(BI) -d $<
 
 clean:
-rm *.o
+	rm *.o
