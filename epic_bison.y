@@ -39,14 +39,12 @@
 		| declaration decList
 		;
 	
-	declaration: type identList;
+	declaration: type identList SEMICOLON;
 	
-	identList: identifier
-		| identifier identList
+	identList: ID
+		| ID COLON identList
 		;
-	
-	identifier: ID;
-	
+		
 	function: type ID LPARENT paramList RPARENT compoundStatement;
 	
 	paramList: type ID;
@@ -67,6 +65,7 @@
 		| forStmt
 		| ifStmt
 		| compoundStatement
+		| SEMICOLON
 		;
 	
 	assignStmt: assign;
@@ -79,10 +78,10 @@
 	
 	call: ID LPARENT argList RPARENT;
 	
-	retStmt: RETURN expr
+	retStmt: RETURN expr SEMICOLON
 	
 	whileStmt: WHILE LPARENT expr RPARENT statement
-		| DO expr WHILE LPARENT expr RPARENT
+		| DO expr WHILE LPARENT expr RPARENT SEMICOLON
 		;
 	
 	forStmt: FOR LPARENT assign SEMICOLON expr SEMICOLON assign RPARENT statement ;
