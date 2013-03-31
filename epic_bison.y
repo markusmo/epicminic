@@ -81,7 +81,7 @@
 	
 	callStmt: call;
 	
-	call: id LPARENT argList RPARENT;
+	call: ID LPARENT argList RPARENT;
 	
 	retStmt: RETURN expr
 	
@@ -113,7 +113,7 @@
 		;
 	
 	argList: expr
-		| expr colon arglist
+		| expr COLON argList
 		;
 
 %%
