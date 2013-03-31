@@ -29,6 +29,7 @@
 	program: decList funcList
 		| decList 
 		| funcList
+		| /* empty */
 		;
 	
 	funcList: function
