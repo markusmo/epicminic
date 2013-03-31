@@ -1,9 +1,13 @@
 #include <stdio.h>
 #include <ctype.h>
 
-int main(int argc, char *arg[])
+int main(int argc, char *argv[])
 {
-	FILE *yyin = fopen("todesprogramm.emc",'r');
+	FILE *yyin = fopen("todesprogramm.emc","r");
+	if(yyin)
+	{
+		printf("opening success");
+	}
 	
 	if(!yyparse())
 	{
