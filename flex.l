@@ -29,13 +29,15 @@ return	return RETURN;
 ">="	return GE;
 "=="	return EQ;
 "!="	return NE;
-"="     return ASIGN;
+"="     return ASSIGN;
 "("	return LPARENT;
 ")"	return RPARENT;
 "{"	return LFANCYBRACKET;
 "}"	return RFANCYBRACKET;
 "["	return LBRACKET;
 "]"	return RBRACKET;
+";" return SEMICOLON;
+"," return COLON;
 %%
 
 main() {
