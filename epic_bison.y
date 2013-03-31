@@ -25,7 +25,7 @@
 	%right '-' '+' MINUS PLUS DIV MULT
 	%right RPARENT ELSE
 %%
-	start: program
+	start: program;
 	
 	program: decList funcList
 		| decList 
@@ -37,7 +37,7 @@
 		;
 	
 	decList: declaration
-		| declaration decList
+		| decList declaration 
 		;
 	
 	declaration: type identList SEMICOLON;
