@@ -3,7 +3,7 @@
 
 int main(int argc, char *arg[])
 {
-	yyin = fopen("todesprogramm.emc","r");
+	FILE *yyin = fopen("todesprogramm.emc",'r');
 	
 	if(!yyparse())
 	{
