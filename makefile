@@ -1,21 +1,28 @@
 CC = gcc
+BI = bison -d -r all
 FL = flex
-BI = bison
-OBJ = epic_bison.tab.o lex.yy.o main.o
+OBJ = main.o epic_bison.tab.o lex.yy.o
+HEADERS = epic_bison.tab.h
 
-%.o:%.c
+all: epic_bison.tab.h epic_bison
 
-epicFrontEnd: $(OBJ) -lfl
+epic_bison: $(OBJ)
 	$(CC) -o $@ $(OBJ) -lfl
 
-$(OBJ):
-	$(CC) -c $*.c
-
 epic_bison.tab.c: epic_bison.y
-	$(BI) -d $<
+	$(BI) epic_bison.y
+
+epic_bison.tab.h: epic_bison.y
+	$(BI) epic_bison.y
+
+%.o: %.c $(HEADERS)
+	$(CC) -c $<
 
 lex.yy.c: flex.l
-	$(FL) -t $<
+	$(FL) $<
+
+lex.yy.o: lex.yy.c
+	$(CC) -c $<
 
 clean:
-	rm -f *.o
+	rm -f $(OBJ) *.tab.c *.tab.h *.yy.c *.output
