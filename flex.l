@@ -29,6 +29,7 @@ return	return RETURN;
 ">="	return GE;
 "=="	return EQ;
 "!="	return NE;
+"="     return ASIGN
 %%
 
 main() {

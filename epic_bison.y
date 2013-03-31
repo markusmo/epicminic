@@ -18,9 +18,9 @@
 	%token IF ELSE
 	%token RETURN
 	%token ID
-	%token UNOP BINOP
+	%token DIV MULT PLUS MINUS LT NE EQ GT LE GE ASIGN
 	
-	%right '='
-	%left AND OR
+	%right '=' ASIGN
 	%left '<' '>' LE GE EQ NE LT GT
+	%right '-' '+' MINUS PLUS
 %%
