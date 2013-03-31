@@ -1,10 +1,6 @@
 %{
 	#include <stdio.h>
 	#include <stdlib.h>
-	#include "AST.h"
-		
-	int yyerror(yyscan_t scanner, SExpression **expression, const char *msg);
-
 %}
 
 %union{
@@ -117,24 +113,3 @@
 		;
 
 %%
-/*
-#include "lex.yy.c"
-#inlude <ctype.h>
-
-int main(int argc, char *arg[])
-{
-	yyin = fopen("program.emc","r");
-	
-	if(!yyparse())
-	{
-		printf("\nDone");
-	}
-	else
-	{
-		printf("\nFail");
-	}
-	fclose(yyin);
-	
-	return 0;
-}
-*/
