@@ -20,13 +20,14 @@
 	%token LPARENT RPARENT LFANCYBRACKET RFANCYBRACKET LBRACKET RBRACKET
 	%token SEMICOLON COLON
 	
-	%right '=' ASSIGN
-	%left '<' '>' LE GE EQ NE LT GT
 	%left LPARENT RPARENT SEMICOLON
-	%right '-' '+' MINUS PLUS DIV MULT
 	%right ELSE COLON
+	%right ASSIGN
+	%left LE GE EQ NE LT GT
+	%right MINUS PLUS DIV MULT
+	%right RPARENT ELSE
 %%
-	start: program
+	start: program;
 	
 	program: decList funcList
 		| decList 
@@ -39,7 +40,7 @@
 		;
 	
 	decList: declaration
-		| declaration decList
+		| decList declaration 
 		;
 	
 	declaration: type identList SEMICOLON;
@@ -53,7 +54,8 @@
 	paramList: type ID;
 	
 	type: INT 
-		| FLOAT;
+		| FLOAT
+		;
 	
 	compoundStatement: LFANCYBRACKET decList stmtList RFANCYBRACKET;
 	
@@ -81,7 +83,7 @@
 	
 	call: ID LPARENT argList RPARENT;
 	
-	retStmt: RETURN expr SEMICOLON
+	retStmt: RETURN expr SEMICOLON;
 	
 	whileStmt: WHILE LPARENT expr RPARENT statement
 		| DO expr WHILE LPARENT expr RPARENT SEMICOLON

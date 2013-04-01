@@ -1,5 +1,5 @@
 CC = gcc
-BI = bison -d -r all
+BI = bison -d -r all --verbose
 FL = flex
 OBJ = main.o epic_bison.tab.o lex.yy.o
 HEADERS = epic_bison.tab.h

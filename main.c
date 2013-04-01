@@ -1,9 +1,13 @@
 #include <stdio.h>
 #include <ctype.h>
 
+extern FILE *yyin;
+extern FILE *yyout;
+
 int main(int argc, char *argv[])
 {
-	FILE *yyin = fopen("todesprogramm.emc","r");
+	yyin = fopen("todesprogramm.emc","r");
+	yyout = fopen("todesoutput", "w");
 	if(yyin)
 	{
 		printf("opening success");
@@ -11,12 +15,13 @@ int main(int argc, char *argv[])
 	
 	if(!yyparse())
 	{
-		printf("\nDone");
+		printf("\nDone\n");
 	}
 	else
 	{
-		printf("\nFail");
+		printf("\nFail\n");
 	}
+	fclose(yyout);
 	fclose(yyin);
 	
 	return 0;
