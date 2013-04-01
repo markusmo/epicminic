@@ -4,9 +4,9 @@ FL = flex
 OBJ = main.o epic_bison.tab.o lex.yy.o
 HEADERS = epic_bison.tab.h
 
-all: epic_bison.tab.h epic_bison
+all: epic_bison.tab.h epic_parser clean
 
-epic_bison: $(OBJ)
+epic_parser: $(OBJ)
 	$(CC) -o $@ $(OBJ) -lfl
 
 epic_bison.tab.c: epic_bison.y

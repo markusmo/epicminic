@@ -42,4 +42,5 @@ id [a-zA-Z][a-zA-Z_]*
 "]"	{return(RBRACKET); }
 ";"	{return(SEMICOLON); }
 ","	{return(COLON); }
+[ \t\n\r] {/* skip whitespace*/ }
 %%
