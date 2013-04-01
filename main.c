@@ -6,8 +6,13 @@ extern FILE *yyout;
 
 int main(int argc, char *argv[])
 {
-	yyin = fopen("todesprogramm.emc","r");
-	yyout = fopen("todesoutput", "w");
+	if(argc < 3)
+	{
+		printf("Please enter: epic_parser *in_filename* *out_filename*\n");
+		return 0;
+	}
+	yyin = fopen(argv[1],"r");
+	yyout = fopen(argv[2], "w");
 	if(yyin)
 	{
 		printf("opening success");
