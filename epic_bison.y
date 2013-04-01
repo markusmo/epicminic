@@ -22,8 +22,9 @@
 	
 	%right '=' ASSIGN
 	%left '<' '>' LE GE EQ NE LT GT
+	%left LPARENT RPARENT SEMICOLON
 	%right '-' '+' MINUS PLUS DIV MULT
-	%right RPARENT ELSE
+	%right ELSE COLON
 %%
 	start: program
 	
