@@ -1,2 +1,2 @@
 int gEpic;
-gEpic = 0;
+float fEpic;
