@@ -23,9 +23,9 @@
 	%right ASSIGN
 	%left LE GE EQ NE LT GT
 	%right MINUS PLUS DIV MULT
-	%right RPARENT ELSE
+	%right RPARENT ELSE LBRACKET
 	%right COLON
-	%left LPARENT SEMICOLON UNOP
+	%left LPARENT SEMICOLON UNOP RBRACKET
 
 %%
 	start: program;
@@ -101,7 +101,7 @@
 	
 	arg: expr;
 	
-	args: COLON args
+	args: COLON argList
 		| /* empty */
 	
 	assignStmt: assign;
