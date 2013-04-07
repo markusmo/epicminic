@@ -50,12 +50,12 @@
 		| /* empty */		
 		;
 	
-	funcList: function
-		| function funcList
+	funcList: function 		{ $$ = $1; }
+		| function funcList	{ $2->prev = $1; }
 		;
 	
-	decList: declaration
-		| decList declaration 
+	decList: declaration		{ $$ = $1; }
+		| decList declaration 	{ $2->prev = $1; }
 		;
 	
 	declaration: type identList SEMICOLON;
@@ -64,7 +64,7 @@
 		| ID COLON identList
 		;
 		
-	function: type ID LPARENT paramList RPARENT compoundStatement;
+	function: type ID LPARENT paramList RPARENT compoundStatement	{ struct FUNCTION f; f.t = $1; f.ID = $2; f.ParamList = $4; f.CompoundStatement = $6; $$ = f; };
 	
 	paramList: type ID;
 	
@@ -74,8 +74,8 @@
 	
 	compoundStatement: LFANCYBRACKET decList stmtList RFANCYBRACKET { struct COMPOUNDSTMT c; c.DeclList = $2; c.StmtList = $3; $$ = c };
 	
-	stmtList: statement
-		| statement stmtList
+	stmtList: statement		{ $$ = $1; }
+		| statement stmtList	{ $2->prev = $1; }
 		;
 	
 	statement: assignStmt		{ struct STMT s; s.e_stmt = Stmt.eAssign; s.stmt = $1; $$ = s}
