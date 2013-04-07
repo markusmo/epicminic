@@ -1,15 +1,14 @@
 
 typedef enum
-{eINT,eFLOAT} Typee;
-
+{eInt,eFloat} Typee;
 typedef enum
-{eassign,ecall,eret,ewhile,efor,eif,ecompound,esemi} Stmt;
-
+{eNegative} Unop;
 typedef enum
-{eunop,ebinop,eecall,eintnum,efloatnum,eid,eid2,eexpr} Expre;
+{eAssign,eCall,eRet,eWhile,eFor,eIf,eCompound,eSemi} Stmt;
 typedef enum
-{eplus,eminus,emod,epmod,elt,egt,elte,egte,eeq,eneq} Binop;
-
+{eUnop,eBinop,eCallExpr,eIntnum,eFloatnum,eId,eExpr} Expre;
+typedef enum
+{ePlus,eMinus,eMult,eDiv,eLT,eGT,eLTE,eGTE,eEQ,eNEQ} Binop;
 
 
 struct PROGRAM
@@ -20,19 +19,20 @@ struct PROGRAM
 
 struct DECLARATION
 {
-	Typee t; 
+	Typee t;
 	struct IDENTIFIER *ilist;
-	struct DECLARATION *prev;	
+	struct DECLARATION *prev;
 };
+
 
 struct IDENTIFIER
 {
 	char *ID;
-	int intnum;
+	int intnum; //zero ,if scalar
 	struct IDENTIFIER *prev;
-};
 
-struct FUNCTION
+};
+struct FUNCTION  // *prev  type id (parameter) {} 
 {
 	Typee t;
 	char *ID;
@@ -47,74 +47,101 @@ struct PARAMETER
 	struct IDENTIFIER *id;
 	struct PARAMETER *prev;
 };
-struct COMPOUNDSTMT
+struct COMPOUNDSTMT // {}
 {
 	struct DECLARATION *DeclList;
 	struct STMT *StmtList;
 };
 
-struct STMT ////////////////////
+struct STMT 
 {	
-	Stmt s;
-	void *inner;
+	Stmt e_stmt;
+	union {
+		struct ASSIGN *assign_s; // id=expr;
+		struct CALL *call_s; //id(arg) 
+		struct EXPR *return_s; //return expr
+		struct WHILEs *while_s; //while()stmt
+		struct FORs *for_s; //for()stmt
+		struct IFs *if_s;  //if()stmt
+		struct COMPOUNDSTMT *compound_s; // {}
+	} stmt; 
 	struct STMT *prev;
 };
 
+
+///// id[index]=expr;
 struct ASSIGN
 {
 	char *ID;
-	struct EXPR *expr1;
-	struct EXPR *expr2;
+	struct EXPR *index; //Null, if LHS is scalar variable
+	struct EXPR *expr;  // RHS
 };
+//// id(arglist?);
 struct CALL
 {
 	char *ID;
 	struct ARGLIST *arg;
 };
+//// (expr,expr*)
 struct ARGLIST
 {
 	struct EXPR *expr;
 	struct ARGLIST *prev;
 
 };
-
-struct WHILEs ///////////////////
+///// while(condition)stmt;
+struct WHILEs 
 {
 	struct EXPR *condition;
 	struct STMT *stmt;
 
-
 };
+/// for(init;condition;next)stmt;
 struct FORs
 {
 	struct ASSIGN *init;
 	struct EXPR *condition;
-	struct ASSIGN *calc;
-	struct STMT *stmt; ////////////////
+	struct ASSIGN *next;
+	struct STMT *stmt; 
 
 };
 
-struct IFs /////////////////////////
+//// if(condition)if_s else else_s
+struct IFs
 {
 	struct EXPR *condition;
-	struct STMT *stmt;
-	struct STMT *stmt2;
+	struct STMT *if_s;
+	struct STMT *else_s; //NUll, if 'else' not exist
 };
 struct EXPR
 {
-	Expre aa;
-	int intnum;
-	float floatnum;
-	void *inner;
+	Expre e_expr;   // EXPR type (enumeration type)
+	union
+	{
+		int intnum; //int
+		float floatnum; // float
+		struct UNOP *unop_expr; //-expr
+		struct BINOP *binop_expr; // expr A expr
+		struct CALL *call_expr; //call
+		struct EXPR *bracket; //(expr)
+		struct IDs *ID_expr; //id[expr]
+	} expression;
 };
+struct UNOP
+{
+	Unop u;
+	struct EXPR *expr;
+};
+///  expr1+ expr2
 struct BINOP
 {
+	Binop bi;
 	struct EXPR *expr1;
-	Binop bi; 
 	struct EXPR *expr2;
 };
+/// id[expr]
 struct IDs
 {
 	char *ID;
-	struct EXPR *expr;
+	struct EXPR *expr; //NULL , if scalar variable
 };
