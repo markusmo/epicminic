@@ -66,7 +66,11 @@
 		
 	function: type ID LPARENT paramList RPARENT compoundStatement	{ struct FUNCTION f; f.t = $1; f.ID = $2; f.ParamList = $4; f.CompoundStatement = $6; $$ = f; };
 	
-	paramList: type ID;
+	paramList: param
+		| param paramList
+		;
+	
+	param: type ID;
 	
 	type: INT 
 		| FLOAT
