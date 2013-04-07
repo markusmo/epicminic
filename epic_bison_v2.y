@@ -6,7 +6,7 @@
 
 %union{
 	int *ivalue;
-    float *fvalue;
+	float *fvalue;
 }
 
 	%token INT
@@ -28,10 +28,8 @@
 	%right COLON
 	%left LPARENT SEMICOLON UNOP RBRACKET
 
-%%
-	start: program;
-	
-	program: decList funcList;
+%%	
+	program: decList funcList { struct program p; p.DeclList = $1; p.FuncList = $2; $$ = p;  };
 	
 	decList: declaration
 		| decList declaration

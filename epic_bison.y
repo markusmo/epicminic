@@ -4,9 +4,25 @@
 %}
 
 %union{
-	int *ivalue;
-    float *fvalue;
+	int ivalue;
+    	float fvalue;
+	ARGLIST *arglist
+	IFs *ifstmt
+	STMT *stmt
+	FORs *forstmt
+	ASSIGN *assignstmt
+	CALL *callstmt
+	WHILEs *whilestmt
 }
+
+	%type <ivalue> expr
+	%type <arglist> argList
+	%type <ifstmt> ifStmt
+	%type <stmt> statement
+	%type <forstmt> forStmt
+	%type <assignstmt> assignStmt
+	%type <callstmt> callStmt
+	%type <whilestmt> whileStmt
 
 	%token INT
 	%token <ivalue> INTNUM
@@ -15,7 +31,7 @@
 	%token FOR WHILE DO
 	%token IF ELSE
 	%token RETURN
-	%token ID
+	%token <string> ID
 	%token DIV MULT PLUS MINUS LT NE EQ GT LE GE ASSIGN
 	%token LPARENT RPARENT LFANCYBRACKET RFANCYBRACKET LBRACKET RBRACKET
 	%token SEMICOLON COLON
@@ -28,12 +44,10 @@
 	%left LPARENT SEMICOLON
 
 %%
-	start: program;
-	
-	program: decList funcList
-		| decList 
-		| funcList
-		| /* empty */
+	program: decList funcList	
+		| decList 		
+		| funcList		
+		| /* empty */		
 		;
 	
 	funcList: function
@@ -58,63 +72,59 @@
 		| FLOAT
 		;
 	
-	compoundStatement: LFANCYBRACKET decList stmtList RFANCYBRACKET;
+	compoundStatement: LFANCYBRACKET decList stmtList RFANCYBRACKET { struct COMPOUNDSTMT c; c.DeclList = $2; c.StmtList = $3; $$ = c };
 	
 	stmtList: statement
 		| statement stmtList
 		;
 	
-	statement: assignStmt
-		| callStmt
-		| retStmt
-		| whileStmt
-		| forStmt
-		| ifStmt
-		| compoundStatement
-		| SEMICOLON
+	statement: assignStmt		{ struct STMT s; s.e_stmt = Stmt.eAssign; s.stmt = $1; $$ = s}
+		| callStmt		{ struct STMT s; s.e_stmt = Stmt.eCall; s.stmt = $1; $$ = s}
+		| retStmt		{ struct STMT s; s.e_stmt = Stmt.eRet; s.stmt = $1; $$ = s }
+		| whileStmt		{ struct STMT s; s.e_stmt = Stmt.eWhile; s.stmt = $1; $$ = s }
+		| forStmt		{ struct STMT s; s.e_stmt = Stmt.eFor; s.stmt = $1; $$ = s }
+		| ifStmt		{ struct STMT s; s.e_stmt = Stmt.eIf; s.stmt = $1; $$ = s }
+		| compoundStatement	{ struct STMT s; s.e_stmt = Stmt.eCompound; s.stmt = $1; $$ = s }
+		| SEMICOLON		{ struct STMT s; s.e_stmt = Stmt.eSemi; $$ = s }
 		;
 	
-	assignStmt: assign;
-	
-	assign: ID ASSIGN expr 
-		| ID LBRACKET expr RBRACKET ASSIGN expr
+	assignStmt: ID ASSIGN expr 					{ struct ASSIGN a; a.id = $1; a.expr = $3; $$ = a }
+		| ID LBRACKET expr RBRACKET ASSIGN expr		{ struct ASSIGN a; a.id = $1; a.index = $3; a.expr = $6; $$ = a }
 		;
 	
-	callStmt: call;
+	callStmt: ID LPARENT argList RPARENT	{ struct CALL c; c.id = $1; c.arg = $3; $$ = c };
 	
-	call: ID LPARENT argList RPARENT;
+	retStmt: RETURN expr SEMICOLON		{ struct EXPR e; e.e_expr = Expre.eExpr; e.expression = $2 };		
 	
-	retStmt: RETURN expr SEMICOLON;
-	
-	whileStmt: WHILE LPARENT expr RPARENT statement
-		| DO expr WHILE LPARENT expr RPARENT SEMICOLON
+	whileStmt: WHILE LPARENT expr RPARENT statement			{ struct WHILEs w; w.condition = $3; w.stmt = $5; $$ = w }
+		| DO expr WHILE LPARENT expr RPARENT SEMICOLON		{ struct WHILEs w; w.condition = $2; w.stmt = $5; $$ = w }
 		;
 	
-	forStmt: FOR LPARENT assign SEMICOLON expr SEMICOLON assign RPARENT statement ;
+	forStmt: FOR LPARENT assign SEMICOLON expr SEMICOLON assign RPARENT statement { struct FORs f; f.init = $3; f.condition = $5; f.next = $7; f.stmt = $9; $$ = f } ;
 	
-	ifStmt: IF LPARENT expr RPARENT statement 
-		| IF LPARENT expr RPARENT statement ELSE statement
+	ifStmt: IF LPARENT expr RPARENT statement 			{ struct IFS i; i.condition = $3; i.if_s = $5; $$ = i; }
+		| IF LPARENT expr RPARENT statement ELSE statement	{ struct IFS i; i.condition = $3; i.if_s = $5; i.else_s = $7; $$ = i; }
 		;
 	
-	expr: expr PLUS expr
-		| expr MINUS expr
-		| expr MULT expr
-		| expr DIV expr
-		| expr LT expr
-		| expr LE expr
-		| expr GT expr
-		| expr GE expr
-		| expr EQ expr
-		| expr NE expr
-		| INTNUM
-		| FLOATNUM
-		| ID
-		| ID LBRACKET expr RBRACKET 
-		| LPARENT expr RPARENT
+	expr: expr PLUS expr 			{ struct BINOP b; b.bi = Binop.ePlus; e.expr1 = $1; e.expr2 = $3; $$ = e }
+		| expr MINUS expr 		{ struct BINOP b; b.bi = Binop.eMinus; e.expr1 = $1; e.expr2 = $3; $$ = e }
+		| expr MULT expr 		{ struct BINOP b; b.bi = Binop.eMult; e.expr1 = $1; e.expr2 = $3; $$ = e }
+		| expr DIV expr 		{ struct BINOP b; b.bi = Binop.eDiv; e.expr1 = $1; e.expr2 = $3; $$ = e }
+		| expr LT expr 			{ struct BINOP b; b.bi = Binop.eLT; e.expr1 = $1; e.expr2 = $3; $$ = e }
+		| expr LE expr 			{ struct BINOP b; b.bi = Binop.eLTE; e.expr1 = $1; e.expr2 = $3; $$ = e }
+		| expr GT expr 			{ struct BINOP b; b.bi = Binop.eGT; e.expr1 = $1; e.expr2 = $3; $$ = e }
+		| expr GE expr 			{ struct BINOP b; b.bi = Binop.eGTE; e.expr1 = $1; e.expr2 = $3; $$ = e }
+		| expr EQ expr			{ struct BINOP b; b.bi = Binop.eEQ; e.expr1 = $1; e.expr2 = $3; $$ = e }
+		| expr NE expr			{ struct BINOP b; b.bi = Binop.eNEQ; e.expr1 = $1; e.expr2 = $3; $$ = e }
+		| INTNUM 			{ struct EXPR e; e.e_expr = Expre.eIntnum; e.expression = $1; $$ = e }
+		| FLOATNUM 			{ struct EXPR e; e.e_expr = Expre.eFloatnum; e.expression = $1; $$ = e }
+		| ID 				{ struct EXPR e; e.e_expr = Expre.eId; e.expression = $1; $$ = e }
+		| ID LBRACKET expr RBRACKET 	{ struct IDs i; i.ID = $1; i.expr = $3; $$ = e }
+		| LPARENT expr RPARENT		{ struct EXPR e; e.e_expr = Expre.eExpr; e.expression = $2; $$ = e }
 		;
 	
-	argList: expr
-		| expr COLON argList
+	argList: expr				{ struct ARGLIST a; a.expr = $1; $$ = a }
+		| expr COLON argList		{ struct ARGLIST a; a.expr = $1; a.prev = $3; $$ = a }
 		;
 
 %%
