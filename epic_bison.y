@@ -1,32 +1,46 @@
 %{
+	#include "AST.h"
 	#include <stdio.h>
 	#include <stdlib.h>
 %}
 
-%union{
+%union {
 	int ivalue;
     	float fvalue;
-	ARGLIST *arglist
-	IFs *ifstmt
+	PROGRAM *prog
+	DECLARATION *decl
+	FUNCTION *func
+	PARAMETER *param
+	COMPOUNDSTMT *cmpstmt
 	STMT *stmt
-	FORs *forstmt
 	ASSIGN *assignstmt
 	CALL *callstmt
+	ARGLIST *arglist
 	WHILEs *whilestmt
+	FORs *forstmt
+	IFs *ifstmt
+	EXPR *expr
 }
 
+	%type <string> type
 	%type <ivalue> expr
 	%type <arglist> argList
 	%type <ifstmt> ifStmt
-	%type <stmt> statement
+	%type <stmt> statement stmtList
 	%type <forstmt> forStmt
 	%type <assignstmt> assignStmt
 	%type <callstmt> callStmt
 	%type <whilestmt> whileStmt
+	%type <func> funcList function
+	%type <cmpstmt> compoundStatement
+	%type <decl> decList declaration
+	%type <param> paramList param
+	%type <expr> retStmt
+	%type <prog> program
 
-	%token INT
+	%token <string> INT
 	%token <ivalue> INTNUM
-	%token FLOAT
+	%token <string> FLOAT
 	%token <fvalue> FLOATNUM
 	%token FOR WHILE DO
 	%token IF ELSE
@@ -44,10 +58,10 @@
 	%left LPARENT SEMICOLON
 
 %%
-	program: decList funcList	
-		| decList 		
-		| funcList		
-		| /* empty */		
+	program: decList funcList 	{ struct ṔROGRAM p; p.DeclList = $1; p.FuncList = $2; $$ = p }
+		| decList 		{ struct PROGRAM p; p.DeclList = $1; $$ = p }
+		| funcList		{ struct PROGRAM p; p.FuncList = $1; $$ = p }
+		| /* empty */		{ struct PROGRAM p; $$ = p }
 		;
 	
 	funcList: function 		{ $$ = $1; }
@@ -58,7 +72,7 @@
 		| decList declaration 	{ $2->prev = $1; }
 		;
 	
-	declaration: type identList SEMICOLON;
+	declaration: type identList SEMICOLON {  };
 	
 	identList: ID
 		| ID COLON identList
@@ -70,7 +84,7 @@
 		| param paramList
 		;
 	
-	param: type ID;
+	param: type ID { printf("%s", type };
 	
 	type: INT 
 		| FLOAT
@@ -92,7 +106,7 @@
 		| SEMICOLON		{ struct STMT s; s.e_stmt = Stmt.eSemi; $$ = s }
 		;
 	
-	assignStmt: ID ASSIGN expr 					{ struct ASSIGN a; a.id = $1; a.expr = $3; $$ = a }
+	assignStmt: ID ASSIGN expr 				{ struct ASSIGN a; a.id = $1; a.expr = $3; $$ = a }
 		| ID LBRACKET expr RBRACKET ASSIGN expr		{ struct ASSIGN a; a.id = $1; a.index = $3; a.expr = $6; $$ = a }
 		;
 	
@@ -104,7 +118,7 @@
 		| DO expr WHILE LPARENT expr RPARENT SEMICOLON		{ struct WHILEs w; w.condition = $2; w.stmt = $5; $$ = w }
 		;
 	
-	forStmt: FOR LPARENT assign SEMICOLON expr SEMICOLON assign RPARENT statement { struct FORs f; f.init = $3; f.condition = $5; f.next = $7; f.stmt = $9; $$ = f } ;
+	forStmt: FOR LPARENT assignStmt SEMICOLON expr SEMICOLON assignStmt RPARENT statement { struct FORs f; f.init = $3; f.condition = $5; f.next = $7; f.stmt = $9; $$ = f } ;
 	
 	ifStmt: IF LPARENT expr RPARENT statement 			{ struct IFS i; i.condition = $3; i.if_s = $5; $$ = i; }
 		| IF LPARENT expr RPARENT statement ELSE statement	{ struct IFS i; i.condition = $3; i.if_s = $5; i.else_s = $7; $$ = i; }
