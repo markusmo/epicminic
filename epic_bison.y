@@ -78,13 +78,13 @@
 		| ID COLON identList
 		;
 		
-	function: type ID LPARENT paramList RPARENT compoundStatement	{ struct FUNCTION f; f.t = $1; f.ID = $2; f.ParamList = $4; f.CompoundStatement = $6; $$ = f; };
+	function: type ID LPARENT paramList RPARENT compoundStatement	{ struct FUNCTION f; f.t = $1; f.ID = $2; f.ParamList = $4; f.CStmt = $6; $$ = f; };
 	
 	paramList: param
 		| param paramList
 		;
 	
-	param: type ID { printf("%s", type };
+	param: type ID { };
 	
 	type: INT 
 		| FLOAT
@@ -106,11 +106,11 @@
 		| SEMICOLON		{ struct STMT s; s.e_stmt = Stmt.eSemi; $$ = s }
 		;
 	
-	assignStmt: ID ASSIGN expr 				{ struct ASSIGN a; a.id = $1; a.expr = $3; $$ = a }
-		| ID LBRACKET expr RBRACKET ASSIGN expr		{ struct ASSIGN a; a.id = $1; a.index = $3; a.expr = $6; $$ = a }
+	assignStmt: ID ASSIGN expr 				{ struct ASSIGN a; a.ID = $1; a.expr = $3; $$ = a }
+		| ID LBRACKET expr RBRACKET ASSIGN expr		{ struct ASSIGN a; a.ID = $1; a.index = $3; a.expr = $6; $$ = a }
 		;
 	
-	callStmt: ID LPARENT argList RPARENT	{ struct CALL c; c.id = $1; c.arg = $3; $$ = c };
+	callStmt: ID LPARENT argList RPARENT	{ struct CALL c; c.ID = $1; c.arg = $3; $$ = c };
 	
 	retStmt: RETURN expr SEMICOLON		{ struct EXPR e; e.e_expr = Expre.eExpr; e.expression = $2 };		
 	
@@ -124,20 +124,20 @@
 		| IF LPARENT expr RPARENT statement ELSE statement	{ struct IFS i; i.condition = $3; i.if_s = $5; i.else_s = $7; $$ = i; }
 		;
 	
-	expr: expr PLUS expr 			{ struct BINOP b; b.bi = Binop.ePlus; e.expr1 = $1; e.expr2 = $3; $$ = e }
-		| expr MINUS expr 		{ struct BINOP b; b.bi = Binop.eMinus; e.expr1 = $1; e.expr2 = $3; $$ = e }
-		| expr MULT expr 		{ struct BINOP b; b.bi = Binop.eMult; e.expr1 = $1; e.expr2 = $3; $$ = e }
-		| expr DIV expr 		{ struct BINOP b; b.bi = Binop.eDiv; e.expr1 = $1; e.expr2 = $3; $$ = e }
-		| expr LT expr 			{ struct BINOP b; b.bi = Binop.eLT; e.expr1 = $1; e.expr2 = $3; $$ = e }
-		| expr LE expr 			{ struct BINOP b; b.bi = Binop.eLTE; e.expr1 = $1; e.expr2 = $3; $$ = e }
-		| expr GT expr 			{ struct BINOP b; b.bi = Binop.eGT; e.expr1 = $1; e.expr2 = $3; $$ = e }
-		| expr GE expr 			{ struct BINOP b; b.bi = Binop.eGTE; e.expr1 = $1; e.expr2 = $3; $$ = e }
-		| expr EQ expr			{ struct BINOP b; b.bi = Binop.eEQ; e.expr1 = $1; e.expr2 = $3; $$ = e }
-		| expr NE expr			{ struct BINOP b; b.bi = Binop.eNEQ; e.expr1 = $1; e.expr2 = $3; $$ = e }
+	expr: expr PLUS expr 			{ struct BINOP b; b.bi = Binop.ePlus; b.expr1 = $1; b.expr2 = $3; $$ = b }
+		| expr MINUS expr 		{ struct BINOP b; b.bi = Binop.eMinus; b.expr1 = $1; b.expr2 = $3; $$ = b }
+		| expr MULT expr 		{ struct BINOP b; b.bi = Binop.eMult; b.expr1 = $1; b.expr2 = $3; $$ = b }
+		| expr DIV expr 		{ struct BINOP b; b.bi = Binop.eDiv; b.expr1 = $1; b.expr2 = $3; $$ = b }
+		| expr LT expr 			{ struct BINOP b; b.bi = Binop.eLT; b.expr1 = $1; b.expr2 = $3; $$ = b }
+		| expr LE expr 			{ struct BINOP b; b.bi = Binop.eLTE; b.expr1 = $1; b.expr2 = $3; $$ = b }
+		| expr GT expr 			{ struct BINOP b; b.bi = Binop.eGT; b.expr1 = $1; b.expr2 = $3; $$ = b }
+		| expr GE expr 			{ struct BINOP b; b.bi = Binop.eGTE; b.expr1 = $1; b.expr2 = $3; $$ = b }
+		| expr EQ expr			{ struct BINOP b; b.bi = Binop.eEQ; b.expr1 = $1; b.expr2 = $3; $$ = b }
+		| expr NE expr			{ struct BINOP b; b.bi = Binop.eNEQ; b.expr1 = $1; b.expr2 = $3; $$ = b }
 		| INTNUM 			{ struct EXPR e; e.e_expr = Expre.eIntnum; e.expression = $1; $$ = e }
 		| FLOATNUM 			{ struct EXPR e; e.e_expr = Expre.eFloatnum; e.expression = $1; $$ = e }
 		| ID 				{ struct EXPR e; e.e_expr = Expre.eId; e.expression = $1; $$ = e }
-		| ID LBRACKET expr RBRACKET 	{ struct IDs i; i.ID = $1; i.expr = $3; $$ = e }
+		| ID LBRACKET expr RBRACKET 	{ struct IDs i; i.ID = $1; i.expr = $3; $$ = i }
 		| LPARENT expr RPARENT		{ struct EXPR e; e.e_expr = Expre.eExpr; e.expression = $2; $$ = e }
 		;
 	

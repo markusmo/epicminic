@@ -21,9 +21,9 @@ id [a-zA-Z][a-zA-Z_]*
 "else"	{return(ELSE); }
 "for"	{return(FOR); }
 "return"	return(RETURN);
-{number}	{return(INTNUM); }
-{floating}	{return(FLOATNUM); }
-{id}	{return(ID); }
+{number}	{yyval = atoi(yytext); return(INTNUM); }
+{floating}	{yyval = atoi(yytext); return(FLOATNUM); }
+{id}	{yyval = atoi(yytext); return(ID); }
 "*"	{return(MULT); }
 "/"	{return(DIV); }
 "+"	{return(PLUS); }
