@@ -1,7 +1,7 @@
 %{
+  #include "AST.h"
   #include <stdio.h>
   #include <stdlib.h>
-  #include "AST.h"
   #include "epic_bison.tab.h"
 %}
 
@@ -20,10 +20,10 @@ id [a-zA-Z][a-zA-Z_]*
 "if"	{return(IF); }
 "else"	{return(ELSE); }
 "for"	{return(FOR); }
-"return"	return(RETURN);
-{number}	{yyval = atoi(yytext); return(INTNUM); }
-{floating}	{yyval = atoi(yytext); return(FLOATNUM); }
-{id}	{yyval = atoi(yytext); return(ID); }
+"return"	{ return(RETURN); }
+{number}	{ return(INTNUM); }
+{floating}	{ return(FLOATNUM); }
+{id}	{return(ID); }
 "*"	{return(MULT); }
 "/"	{return(DIV); }
 "+"	{return(PLUS); }
