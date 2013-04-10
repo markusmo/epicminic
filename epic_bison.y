@@ -2,11 +2,9 @@
 	#include <stdio.h>
 	#include <stdlib.h>
 }
-
 %code requires{
 	#include "AST.h"
 }
-
 %union {
 	int ivalue;
     float fvalue;
