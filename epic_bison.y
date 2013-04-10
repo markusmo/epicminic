@@ -9,7 +9,7 @@
 
 %union {
 	int ivalue;
-    	float fvalue;
+    float fvalue;
 	char *string;
 	struct PROGRAM *prog;
 	struct DECLARATION *decl;
