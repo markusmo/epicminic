@@ -1,3 +1,14 @@
+/* 
+   _____ _        __                    _         _ _       __                   _                      _ _ 
+  / ____| |      / _|                  | |       | (_)     / _|                 | |                    | | |
+ | (___ | |_ ___| |_ __ _ _ __       __| |_   _  | |_  ___| |_ ___ _ __ ___  ___| |__    _ __   ___  __| | |
+  \___ \| __/ _ \  _/ _` | '_ \     / _` | | | | | | |/ _ \  _/ _ \ '__/ __|/ __| '_ \  | '_ \ / _ \/ _` | |
+  ____) | ||  __/ || (_| | | | |_  | (_| | |_| | | | |  __/ ||  __/ |  \__ \ (__| | | | | | | |  __/ (_| |_|
+ |_____/ \__\___|_| \__,_|_| |_( )  \__,_|\__,_| |_|_|\___|_| \___|_|  |___/\___|_| |_| |_| |_|\___|\__,_(_)
+                               |/                                                                           
+                                                                                                            
+*/
+
 %code top{
 	#include <stdio.h>
 	#include <stdlib.h>
@@ -7,7 +18,7 @@
 }
 %union {
 	int ivalue;
-    float fvalue;
+    	float fvalue;
 	char *string;
 	struct PROGRAM *prog;
 	struct DECLARATION *decl;
@@ -24,6 +35,7 @@
 	struct EXPR *exp;
 	struct BINOP *binop;
 	struct IDs *id;
+	struct IDENTIFIER *idenf;
 }
 
 	%type <string> type
@@ -40,7 +52,7 @@
 	%type <param> paramList
 	%type <exp> retStmt expr
 	%type <prog> program
-	%type <id> identifier
+	%type <idenf> identifier identList
 
 	%token <string> INT
 	%token <ivalue> INTNUM
@@ -69,17 +81,17 @@
 		;
 	
 	funcList: function 		{ $$ = $1; }
-		| function funcList	{ $2->prev = $1; }
+		| funcList function 	{ $1->prev = $2; }
 		;
 	
 	decList: declaration		{ $$ = $1; }
-		| decList declaration 	{ $2->prev = $1; }
+		| decList declaration 	{ $1->prev = $2; }
 		;
 	
-	declaration: type identList SEMICOLON {  };
+	declaration: type identList SEMICOLON { struct DECLARATION d; d.t = $1; d.ilist = $2; $$ = &d  };
 	
-	identList: identifier
-		| identifier COLON identList
+	identList: identifier			{ $$ = $1; }
+		| identList COLON identifier	{ $1->prev = $3 }
 		;
 	
 	identifier: ID				{ struct IDs i; i.ID = $1; $$ = &i; }
@@ -87,24 +99,24 @@
 		;
 
 	function: type ID LPARENT paramList RPARENT compoundStatement	{ struct FUNCTION f; f.t = $1; f.ID = $2; f.ParamList = $4; f.CStmt = $6; $$ = &f; }
-		| type ID LPARENT RPARENT compoundStatement 				{ struct FUNCTION f; f.t = $1; f.ID = $2; f.CStmt = $5; $$ = &f; }
+		| type ID LPARENT RPARENT compoundStatement 		{ struct FUNCTION f; f.t = $1; f.ID = $2; f.CStmt = $5; $$ = &f; }
 		;
 	
-	paramList: type identifier		{ }
-		| paramList type identifier	{ }
+	paramList: type identifier		{ struct PARAMETER p; p.t = $1; p.id = $2; $$ = &p; }
+		| paramList type identifier	{ struct PARAMETER P; p.t = $2; p.id = $3; $1->prev = &p; $$ = &p; }
 		;
 
-	type: INT 
-		| FLOAT
+	type: INT 		{ $$ = $1 }
+		| FLOAT 	{ $$ = $1 }
 		;
 	
-	compoundStatement: LFANCYBRACKET decList stmtList RFANCYBRACKET { struct COMPOUNDSTMT c; c.DeclList = $2; c.StmtList = $3; $$ = &c }
-		| LFANCYBRACKET stmtList RFANCYBRACKET 						{ struct COMPOUNDSTMT c; c.StmtList = $2; $$ = &c }
+	compoundStatement: LFANCYBRACKET stmtList RFANCYBRACKET 		{ struct COMPOUNDSTMT c; c.StmtList = $2; $$ = &c }
+		|  	LFANCYBRACKET decList stmtList RFANCYBRACKET		{ struct COMPOUNDSTMT c; c.DeclList = $2; c.StmtList = $3; $$ = &c }
 		;
 	
 	stmtList: statement		{ $$ = $1; }
-		| stmtList statement 	{ $2->prev = $1; }
-		| /* empty */		{ }
+		| stmtList statement  	{ $1->prev = $2; }
+		//| /* empty */		{ }  ----> TODO shift / reduce
 		;
 	
 	statement: assignStmt		{ struct STMT s; s.e_stmt = eAssign; s.stmt.assign_s = $1; $$ = &s}
@@ -121,15 +133,15 @@
 		| ID LBRACKET expr RBRACKET ASSIGN expr SEMICOLON	{ struct ASSIGN a; a.ID = $1; a.index = $3; a.expr = $6; $$ = &a }
 		;
 	
-	callStmt: ID LPARENT argList RPARENT SEMICOLON	{ struct CALL c; c.ID = $1; c.arg = $3; $$ = &c }
-		| ID LPARENT RPARENT SEMICOLON 				{ struct CALL c; c.ID = $1; $$ = &c }
+	callStmt: ID LPARENT argList RPARENT SEMICOLON		{ struct CALL c; c.ID = $1; c.arg = $3; $$ = &c }
+		| ID LPARENT RPARENT SEMICOLON 			{ struct CALL c; c.ID = $1; $$ = &c }
 		;
 	
-	retStmt: RETURN expr SEMICOLON		{ struct EXPR e; e.e_expr = eExpr; e.expression.bracket = $2; $$ = &e }
+	retStmt: RETURN expr SEMICOLON				{ struct EXPR e; e.e_expr = eExpr; e.expression.bracket = $2; $$ = &e }
 		| RETURN SEMICOLON				{ struct EXPR e; e.e_expr = eExpr; $$ = &e }
 		;	
 	
-	whileStmt: WHILE LPARENT expr RPARENT statement			{ struct WHILEs w; w.condition = $3; w.stmt = $5; $$ = &w }
+	whileStmt: WHILE LPARENT expr RPARENT statement				{ struct WHILEs w; w.condition = $3; w.stmt = $5; $$ = &w }
 		| DO statement WHILE LPARENT expr RPARENT SEMICOLON		{ struct WHILEs w; w.condition = $5; w.stmt = $2; $$ = &w }
 		;
 	
@@ -139,7 +151,7 @@
 		| IF LPARENT expr RPARENT statement ELSE statement	{ struct IFs i; i.condition = $3; i.if_s = $5; i.else_s = $7; $$ = &i; }
 		;
 	
-	expr: expr PLUS expr 				{ struct BINOP b; struct EXPR e; b.bi = ePlus; b.expr1 = $1; b.expr2 = $3; e.e_expr = eBinop; e.expression.binop_expr = &b; $$ = &e }
+	expr: expr PLUS expr 					{ struct BINOP b; struct EXPR e; b.bi = ePlus; b.expr1 = $1; b.expr2 = $3; e.e_expr = eBinop; e.expression.binop_expr = &b; $$ = &e }
 		| expr MINUS expr 				{ struct BINOP b; struct EXPR e; b.bi = eMinus; b.expr1 = $1; b.expr2 = $3; e.e_expr = eBinop; e.expression.binop_expr = &b; $$ = &e }
 		| expr MULT expr 				{ struct BINOP b; struct EXPR e; b.bi = eMult; b.expr1 = $1; b.expr2 = $3; e.e_expr = eBinop; e.expression.binop_expr = &b; $$ = &e }
 		| expr DIV expr 				{ struct BINOP b; struct EXPR e; b.bi = eDiv; b.expr1 = $1; b.expr2 = $3; e.e_expr = eBinop; e.expression.binop_expr = &b; $$ = &e }
@@ -149,12 +161,13 @@
 		| expr GE expr 					{ struct BINOP b; struct EXPR e; b.bi = eGTE; b.expr1 = $1; b.expr2 = $3; e.e_expr = eBinop; e.expression.binop_expr = &b; $$ = &e }
 		| expr EQ expr					{ struct BINOP b; struct EXPR e; b.bi = eEQ; b.expr1 = $1; b.expr2 = $3; e.e_expr = eBinop; e.expression.binop_expr = &b; $$ = &e }
 		| expr NE expr					{ struct BINOP b; struct EXPR e; b.bi = eNEQ; b.expr1 = $1; b.expr2 = $3; e.e_expr = eBinop; e.expression.binop_expr = &b; $$ = &e }
-		| INTNUM 						{ struct EXPR e; e.e_expr = eIntnum; e.expression.intnum = $1; $$ = &e }
-		| FLOATNUM 						{ struct EXPR e; e.e_expr = eFloatnum; e.expression.floatnum = $1; $$ = &e }
-		| ID 							{ struct EXPR e; struct IDs i; i.ID = $1; e.e_expr = eId; e.expression.ID_expr = &i; $$ = &e }
-		| ID LBRACKET expr RBRACKET 	{ struct EXPR e; struct IDs i; i.ID = $1; i.expr = $3; e.e_expr = eId; e.expression.ID_expr = &i; $$ = &e }
-		| LPARENT expr RPARENT			{ struct EXPR e; e.e_expr = eExpr; e.expression.bracket = $2; $$ = &e }
-		| callStmt						// missing
+		| MINUS expr					{ struct UNOP u; struct EXPR e; u.u = eNegative; e.e_expr = eUnop; e.expression.unop_expr = &u; $$ = &e }
+		| INTNUM 					{ struct EXPR e; e.e_expr = eIntnum; e.expression.intnum = $1; $$ = &e }
+		| FLOATNUM 					{ struct EXPR e; e.e_expr = eFloatnum; e.expression.floatnum = $1; $$ = &e }
+		| ID 						{ struct EXPR e; struct IDs i; i.ID = $1; e.e_expr = eId; e.expression.ID_expr = &i; $$ = &e }
+		| ID LBRACKET expr RBRACKET 			{ struct EXPR e; struct IDs i; i.ID = $1; i.expr = $3; e.e_expr = eId; e.expression.ID_expr = &i; $$ = &e }
+		| LPARENT expr RPARENT				{ struct EXPR e; e.e_expr = eExpr; e.expression.bracket = $2; $$ = &e }
+		| callStmt					{ struct EXPR e; e.e_expr = eCallExpr; e.call_s = $1; $$ = &e }
 		;
 	
 	argList: expr				{ struct ARGLIST a; a.expr = $1; $$ = &a }
