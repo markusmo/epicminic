@@ -1,7 +1,3 @@
 bison:
 
-function: paramList -> optional
-compoundStatement: DeclList -> optional
-callStmt: argList -> optional
-retStmt: expr -> optional
-expr: call fehlt
+expr: call fehlt noch AST Befehl
