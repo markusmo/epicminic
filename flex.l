@@ -1,5 +1,4 @@
 %{
-  #include "AST.h"
   #include <stdio.h>
   #include <stdlib.h>
   #include "epic_bison.tab.h"

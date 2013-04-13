@@ -1,8 +1,8 @@
 CC = gcc
 BI = bison -d -r all --verbose
 FL = flex
-OBJ = main.o epic_bison.tab.o lex.yy.o
-HEADERS = epic_bison.tab.h
+OBJ = main.o epic_bison.tab.o lex.yy.o printer.o
+HEADERS = epic_bison.tab.h printer.h
 
 all: epic_bison.tab.h epic_parser clean
 

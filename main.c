@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <ctype.h>
 
+#include "printer.h"
+
 extern FILE *yyin;
 extern FILE *yyout;
 
@@ -21,6 +23,7 @@ int main(int argc, char *argv[])
 	if(!yyparse())
 	{
 		printf("\nDone\n");
+		asdf(yyout);
 	}
 	else
 	{

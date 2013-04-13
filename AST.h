@@ -10,12 +10,13 @@ typedef enum
 typedef enum
 {ePlus,eMinus,eMult,eDiv,eLT,eGT,eLTE,eGTE,eEQ,eNEQ} Binop;
 
-
 struct PROGRAM
 {
 	struct DECLARATION *DeclList;
 	struct FUNCTION * FuncList;
 };
+
+struct PROGRAM root;
 
 struct DECLARATION
 {
