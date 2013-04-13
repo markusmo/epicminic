@@ -1,6 +1,0 @@
-#include <stdio.h>
-#include <ctype.h>
-#include "AST.h"
-
-void printAST(FILE *stream);
-void printSymbolTable(FILE *stream);
