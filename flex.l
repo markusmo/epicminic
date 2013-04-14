@@ -9,7 +9,7 @@ number [0-9]+
 floating [0-9]+\.[0-9]+
 letter [a-zA-Z]
 letter2 [a-zA-Z_]
-id [a-zA-Z][a-zA-Z_]*
+id [a-zA-Z][a-zA-Z_0-9]*
 
 %%
 "int"	{return(INT); }

@@ -46,8 +46,8 @@
  %type <ifstmt> ifStmt
  %type <stmt> statement stmtList
  %type <forstmt> forStmt
- %type <assignstmt> assignStmt
- %type <callstmt> callStmt
+ %type <assignstmt> assignStmt assign
+ %type <callstmt> callStmt call
  %type <whilestmt> whileStmt
  %type <func> funcList function
  %type <cmpstmt> compoundStatement
@@ -107,12 +107,14 @@
 
  /* ########### FUNCLIST ########### */
  
- funcList: function   		{ 
+ funcList: function   		{
+					printf("funclist 1\n");
 					$$ = $1; 
 				}
-  | funcList function  		{ 
-					$2->prev = $1; 
-					$$ = $2; 
+  | funcList function  		{
+					printf("funclist 2\n");
+					$1->prev = $2; 
+					$$ = $1; 
 				}
   ;
 
@@ -123,15 +125,15 @@
 					$$ = $1; 
 				}
   | decList declaration  	{ 
-					$2->prev = $1;
-					$$ = $2;
+					$1->prev = $2;
+					$$ = $1;
 				}
   ;
  
 
  /* ########### DECLARATION ########### */
 
- declaration: type identList SEMICOLON 	{ 
+ declaration: type identList SEMICOLON 	{
 						$$ = (struct DECLARATION *) malloc(sizeof(struct DECLARATION));
 						$$->t = $1; 
 						$$->ilist = $2; 
@@ -163,6 +165,7 @@
  /* ########### FUNCTION ########### */
 
  function: type ID LPARENT paramList RPARENT compoundStatement 		{ 
+										printf("function 1\n");
 										$$ = (struct FUNCTION *) malloc(sizeof(struct FUNCTION)); 
 										$$->t = $1; 
 										$$->ID = $2; 
@@ -170,7 +173,8 @@
 										$$->CStmt = $6; 
 										$$->prev = NULL; 
 									}
-  | type ID LPARENT RPARENT compoundStatement   			{ 
+  | type ID LPARENT RPARENT compoundStatement   			{
+										printf("function 1\n");
 										$$ = (struct FUNCTION *) malloc(sizeof(struct FUNCTION));
 										$$->t = $1; 
 										$$->ID = $2; 
@@ -187,11 +191,11 @@
 					$$->t = $1; 
 					$$->id = $2; 
 				}
-  | paramList type identifier 	{ 
+  | paramList COLON type identifier 	{ 
 					$$ = (struct PARAMETER *) malloc(sizeof(struct PARAMETER)); 
-					$$->t = $2; 
-					$$->id = $3; 
-					$1->prev = &p; 
+					$$->t = $3; 
+					$$->id = $4; 
+					$$->prev = $1; 
 				}
   ;
 
@@ -205,7 +209,7 @@
 
  /* ########### COMPOUNDSTATEMENT ########### */ 
 
- compoundStatement: LFANCYBRACKET stmtList RFANCYBRACKET   	{ 
+ compoundStatement: LFANCYBRACKET stmtList RFANCYBRACKET   	{
 									$$ = (struct COMPOUNDSTMT *) malloc(sizeof(struct COMPOUNDSTMT));
 									$$->StmtList = $2;  
 								}
@@ -220,7 +224,7 @@
  /* ########### STMTLIST ########### */
 
  stmtList: statement  { $$ = $1; }
-  | stmtList statement   { $1->prev = $2; }
+  | stmtList statement   { $2->prev = $1; $$ = $2; }
   //| /* empty */  { }  ----> TODO shift / reduce
   ;
 
@@ -264,7 +268,7 @@
 				}
   | SEMICOLON  			{ 
 					$$ = (struct STMT *) malloc(sizeof(struct STMT));
-					s->e_stmt = eSemi; 
+					$$->e_stmt = eSemi; 
 
 				}
   ;
@@ -272,32 +276,35 @@
 
  /* ########### ASSIGNSTMT ########### */ 
 
- assignStmt: ID ASSIGN expr SEMICOLON    		{ 
+ assignStmt: assign SEMICOLON;
+
+ assign: ID ASSIGN expr					{ 
 								$$ = (struct ASSIGN *) malloc(sizeof(struct ASSIGN));
 								$$->ID = $1; 
 								$$->expr = $3; 
 							}
-  | ID LBRACKET expr RBRACKET ASSIGN expr SEMICOLON 	{ 
+	| ID LBRACKET expr RBRACKET ASSIGN expr 	{ 
 								$$ = (struct ASSIGN *) malloc(sizeof(struct ASSIGN));
 								$$->ID = $1; 
 								$$->index = $3; 
 								$$->expr = $6; 
 							}
-  ;
- 
+   ;
 
  /* ########### CALLSTMT ########### */
 
- callStmt: ID LPARENT argList RPARENT SEMICOLON { 
+ callStmt: call SEMICOLON;
+
+ call: ID LPARENT argList RPARENT		{ 
 							$$ = (struct CALL *) malloc(sizeof(struct CALL));
 							$$->ID = $1; 
 							$$->arg = $3; 
 						}
-  | ID LPARENT RPARENT SEMICOLON    		{
+   | ID LPARENT RPARENT				{
 							$$ = (struct CALL *) malloc(sizeof(struct CALL)); 
 							$$->ID = $1; 
 						}
-  ;
+   ;
  
 
  /* ########### RETSTMT ########### */
@@ -330,7 +337,7 @@
 
  
  /* ########### FORSTMT ########### */
- forStmt: FOR LPARENT assignStmt SEMICOLON expr SEMICOLON assignStmt RPARENT statement 	{ 
+ forStmt: FOR LPARENT assign SEMICOLON expr SEMICOLON assign RPARENT statement 	{ 
 												$$ = (struct FORs *) malloc(sizeof(struct FORs));
 												$$->init = $3; 
 												$$->condition = $5; 
@@ -441,7 +448,7 @@ expr: expr PLUS expr      	{
 					$$->expression.unop_expr = (struct UNOP *) malloc(sizeof(struct UNOP));
 					$$->e_expr = eUnop; 
 					$$->expression.unop_expr->u = eNegative; 
-					$$->expression.unop_expr->expr = $1;
+					$$->expression.unop_expr->expr = $2;
 				}
   | INTNUM      		{ 
 					$$ = (struct EXPR *) malloc(sizeof(struct EXPR));
@@ -471,7 +478,7 @@ expr: expr PLUS expr      	{
 					$$->e_expr = eExpr; 
 					$$->expression.bracket = $2; 
 				}
-  | callStmt     		{ 
+  | call     		{ 
 					$$ = (struct EXPR *) malloc(sizeof(struct EXPR));
 					$$->e_expr = eCallExpr; 
 					$$->expression.call_expr = $1; 
@@ -488,7 +495,7 @@ expr: expr PLUS expr      	{
   | expr COLON argList  	{ 
 					$$ = (struct ARGLIST *) malloc(sizeof(struct ARGLIST));
 					$$->expr = $1; 
-					$$->prev = $3; 
+					$3->prev = $$; 
 				}
   ;
 
