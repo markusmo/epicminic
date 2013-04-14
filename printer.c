@@ -1,12 +1,12 @@
 #include "printer.h"
 
-extern struct PROGRAM root;
+extern struct PROGRAM *root;
 
 void asdf(FILE *stream)
 {
-	if (root.DeclList != NULL)
+	if (root->DeclList != NULL)
 	{
-		struct DECLARATION *currentDecl = root.DeclList;
+		struct DECLARATION *currentDecl = root->DeclList;
 int num = 0;
 		while (currentDecl != NULL && num++ < 10)
 		{
@@ -15,7 +15,7 @@ int num = 0;
 			currentDecl = currentDecl->prev;
 		} 
 
-		struct FUNCTION *currentFunc = root.FuncList;
+		struct FUNCTION *currentFunc = root->FuncList;
 num = 0;
 		while (currentFunc != NULL && num++ < 10)
 		{

@@ -16,7 +16,7 @@ struct PROGRAM
 	struct FUNCTION * FuncList;
 };
 
-struct PROGRAM root;
+struct PROGRAM *root;
 
 struct DECLARATION
 {

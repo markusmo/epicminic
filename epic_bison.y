@@ -13,7 +13,7 @@
  #include <stdio.h>
  #include <stdlib.h>
 
- extern struct PROGRAM root;
+ extern struct PROGRAM *root;
 }
 %code requires{
  #include "AST.h"
@@ -83,30 +83,32 @@
  /* ########### PROGRAM ########### */
 
  program: decList funcList  	{ 	
-					root = (PROGRAM *) malloc(sizeof(PROGRAM));
+					root = (struct PROGRAM *) malloc(sizeof(struct PROGRAM));
 					struct PROGRAM p; 
 					p.DeclList = $1; 
 					p.FuncList = $2; 
-					root = p; 
+					root = &p; 
 				}
   | decList   			{ 	
-					root = (PROGRAM *) malloc(sizeof(PROGRAM));
+					root = (struct PROGRAM *) malloc(sizeof(struct PROGRAM));
 					struct PROGRAM p; 
 					p.FuncList = NULL; 
 					p.DeclList = $1; 
-					root = p; 
+					root = &p; 
 				}
   | funcList  			{ 	
-					root = (PROGRAM *) malloc(sizeof(PROGRAM));
+					root = (struct PROGRAM *) malloc(sizeof(struct PROGRAM));
 					struct PROGRAM p; 
 					p.FuncList = $1; 
 					p.DeclList = NULL; 
-					root = p; 
+					root = &p; 
 				}
   | /* empty */  		{ 	
-					root = (PROGRAM *) malloc(sizeof(PROGRAM));
-					root.FuncList = NULL; 
-					root.DeclList = NULL; 
+					root = (struct PROGRAM *) malloc(sizeof(struct PROGRAM));
+					struct PROGRAM p;
+					p.FuncList = NULL;
+					p.DeclList = NULL;
+					root = &p;
 				}
   ;
 
@@ -129,10 +131,8 @@
 					$$ = $1; 
 				}
   | decList declaration  	{ 
-					$$ = (DECLARATION *) malloc(sizeof(DECLARATION));
-					struct DECLARATION* d; 
-					d = $2; d->prev = $1; 
-					$$ = d; 
+					$2->prev = $1;
+					$$ = $2;
 				}
   ;
  
@@ -140,7 +140,7 @@
  /* ########### DECLARATION ########### */
 
  declaration: type identList SEMICOLON 	{ 
-						$$ = (DECLARATION *) malloc(sizeof(DECLARATION));
+						$$ = (struct DECLARATION *) malloc(sizeof(struct DECLARATION));
 						struct DECLARATION d; 
 						d.t = $1; 
 						d.ilist = $2; 
@@ -159,12 +159,13 @@
  /* ########### IDENTIFIER ########### */
 
   identifier: ID    			{ 
-						$$ = (IDENTIFIER *) malloc(sizeof(IDENTIFIER));
+						$$ = (struct IDENTIFIER *) malloc(sizeof(struct IDENTIFIER));
 						struct IDENTIFIER i; 
 						i.ID = $1; 
 						$$ = &i; 
 					}
   | ID LBRACKET INTNUM RBRACKET 	{ 
+						$$ = (struct IDENTIFIER *) malloc(sizeof(struct IDENTIFIER));
 						struct IDENTIFIER i; 
 						i.ID = $1; 
 						i.intnum = $3; 
@@ -176,7 +177,7 @@
  /* ########### FUNCTION ########### */
 
  function: type ID LPARENT paramList RPARENT compoundStatement 		{ 
-										$$ = (FUNCTION *) malloc(sizeof(FUNCTION));
+										$$ = (struct FUNCTION *) malloc(sizeof(struct FUNCTION));
 										struct FUNCTION f; 
 										f.t = $1; 
 										f.ID = $2; 
@@ -186,7 +187,7 @@
 										$$ = &f; 
 									}
   | type ID LPARENT RPARENT compoundStatement   			{ 
-										$$ = (FUNCTION *) malloc(sizeof(FUNCTION));
+										$$ = (struct FUNCTION *) malloc(sizeof(struct FUNCTION));
 										struct FUNCTION f; 
 										f.t = $1; 
 										f.ID = $2; 
@@ -200,14 +201,14 @@
  /* ########### PARAMLIST ########### */
 
  paramList: type identifier  	{ 
-					$$ = (PARAMETER *) malloc(sizeof(PARAMETER));
+					$$ = (struct PARAMETER *) malloc(sizeof(struct PARAMETER));
 					struct PARAMETER p; 
 					p.t = $1; 
 					p.id = $2; 
 					$$ = &p; 
 				}
   | paramList type identifier 	{ 
-					$$ = (PARAMETER *) malloc(sizeof(PARAMETER));
+					$$ = (struct PARAMETER *) malloc(sizeof(struct PARAMETER));
 					struct PARAMETER p; 
 					p.t = $2; 
 					p.id = $3; 
@@ -227,13 +228,13 @@
  /* ########### COMPOUNDSTATEMENT ########### */ 
 
  compoundStatement: LFANCYBRACKET stmtList RFANCYBRACKET   	{ 
-									$$ = (COMPOUNDSTMT *) malloc(sizeof(COMPOUNDSTMT));
+									$$ = (struct COMPOUNDSTMT *) malloc(sizeof(struct COMPOUNDSTMT));
 									struct COMPOUNDSTMT c; 
 									c.StmtList = $2; 
 									$$ = &c; 
 								}
   |   LFANCYBRACKET decList stmtList RFANCYBRACKET  		{ 
-									$$ = (COMPOUNDSTMT *) malloc(sizeof(COMPOUNDSTMT));
+									$$ = (struct COMPOUNDSTMT *) malloc(sizeof(struct COMPOUNDSTMT));
 									struct COMPOUNDSTMT c; 
 									c.DeclList = $2; 
 									c.StmtList = $3; 
@@ -253,56 +254,56 @@
  /* ########### STATEMENT ########### */
 
  statement: assignStmt  	{ 
-					$$ = (STMT *) malloc(sizeof(STMT));
+					$$ = (struct STMT *) malloc(sizeof(struct STMT));
 					struct STMT s; 
 					s.e_stmt = eAssign; 
 					s.stmt.assign_s = $1; 
 					$$ = &s; 
 				}
   | callStmt 			{ 
-					$$ = (STMT *) malloc(sizeof(STMT));
+					$$ = (struct STMT *) malloc(sizeof(struct STMT));
 					struct STMT s; 
 					s.e_stmt = eCall; 
 					s.stmt.call_s = $1; 
 					$$ = &s; 
 				}
   | retStmt  			{ 
-					$$ = (STMT *) malloc(sizeof(STMT));
+					$$ = (struct STMT *) malloc(sizeof(struct STMT));
 					struct STMT s; 
 					s.e_stmt = eRet; 
 					s.stmt.return_s = $1; 
 					$$ = &s; 
 				}
   | whileStmt  			{ 
-					$$ = (STMT *) malloc(sizeof(STMT));
+					$$ = (struct STMT *) malloc(sizeof(struct STMT));
 					struct STMT s; 
 					s.e_stmt = eWhile; 
 					s.stmt.while_s = $1; 
 					$$ = &s; 
 				}
   | forStmt  			{ 
-					$$ = (STMT *) malloc(sizeof(STMT));
+					$$ = (struct STMT *) malloc(sizeof(struct STMT));
 					struct STMT s; 
 					s.e_stmt = eFor; 
 					s.stmt.for_s = $1; 
 					$$ = &s; 
 				}
   | ifStmt  			{ 
-					$$ = (STMT *) malloc(sizeof(STMT));
+					$$ = (struct STMT *) malloc(sizeof(struct STMT));
 					struct STMT s; 
 					s.e_stmt = eIf; 
 					s.stmt.if_s = $1; 
 					$$ = &s; 
 				}
   | compoundStatement 		{ 
-					$$ = (STMT *) malloc(sizeof(STMT));
+					$$ = (struct STMT *) malloc(sizeof(struct STMT));
 					struct STMT s; 
 					s.e_stmt = eCompound; 
 					s.stmt.compound_s = $1; 
 					$$ = &s; 
 				}
   | SEMICOLON  			{ 
-					$$ = (STMT *) malloc(sizeof(STMT));
+					$$ = (struct STMT *) malloc(sizeof(struct STMT));
 					struct STMT s; 
 					s.e_stmt = eSemi; 
 					$$ = &s; 
@@ -313,14 +314,14 @@
  /* ########### ASSIGNSTMT ########### */ 
 
  assignStmt: ID ASSIGN expr SEMICOLON    		{ 
-								$$ = (ASSIGN *) malloc(sizeof(ASSIGN));
+								$$ = (struct ASSIGN *) malloc(sizeof(struct ASSIGN));
 								struct ASSIGN a; 
 								a.ID = $1; 
 								a.expr = $3; 
 								$$ = &a; 
 							}
   | ID LBRACKET expr RBRACKET ASSIGN expr SEMICOLON 	{ 
-								$$ = (ASSIGN *) malloc(sizeof(ASSIGN));
+								$$ = (struct ASSIGN *) malloc(sizeof(struct ASSIGN));
 								struct ASSIGN a; 
 								a.ID = $1; 
 								a.index = $3; 
@@ -333,14 +334,14 @@
  /* ########### CALLSTMT ########### */
 
  callStmt: ID LPARENT argList RPARENT SEMICOLON { 
-							$$ = (CALL *) malloc(sizeof(CALL));
+							$$ = (struct CALL *) malloc(sizeof(struct CALL));
 							struct CALL c; 
 							c.ID = $1; 
 							c.arg = $3; 
 							$$ = &c; 
 						}
   | ID LPARENT RPARENT SEMICOLON    		{
-							$$ = (CALL *) malloc(sizeof(CALL)); 
+							$$ = (struct CALL *) malloc(sizeof(struct CALL)); 
 							struct CALL c; 
 							c.ID = $1; 
 							$$ = &c; 
@@ -351,14 +352,14 @@
  /* ########### RETSTMT ########### */
 
  retStmt: RETURN expr SEMICOLON    	{ 
-						$$ = (EXPR *) malloc(sizeof(EXPR));
+						$$ = (struct EXPR *) malloc(sizeof(struct EXPR));
 						struct EXPR e; 
 						e.e_expr = eExpr; 
 						e.expression.bracket = $2; 
 						$$ = &e; 
 					}
   | RETURN SEMICOLON    		{ 
-						$$ = (EXPR *) malloc(sizeof(EXPR));
+						$$ = (struct EXPR *) malloc(sizeof(struct EXPR));
 						struct EXPR e; 
 						e.e_expr = eExpr; 
 						$$ = &e; 
@@ -369,13 +370,14 @@
  /* ########### WHILESTMT ########### */
 
  whileStmt: WHILE LPARENT expr RPARENT statement    	{ 
-								$$ = (WHILEs *) malloc(sizeof(
+								$$ = (struct WHILEs *) malloc(sizeof(struct WHILEs));
 								struct WHILEs w; 
 								w.condition = $3; 
 								w.stmt = $5; 
 								$$ = &w; 
 							}
   | DO statement WHILE LPARENT expr RPARENT SEMICOLON  	{ 
+								$$ = (struct WHILEs *) malloc(sizeof(struct WHILEs));
 								struct WHILEs w; 
 								w.condition = $5; 
 								w.stmt = $2; 
@@ -386,7 +388,7 @@
  
  /* ########### FORSTMT ########### */
  forStmt: FOR LPARENT assignStmt SEMICOLON expr SEMICOLON assignStmt RPARENT statement 	{ 
-												$$ = (FORs *) malloc(sizeof(FORs));
+												$$ = (struct FORs *) malloc(sizeof(struct FORs));
 												struct FORs f; 
 												f.init = $3; 
 												f.condition = $5; 
@@ -398,14 +400,14 @@
 
  /* ########### IFSTMT ########### */
  ifStmt: IF LPARENT expr RPARENT statement    		{ 
-								$$ = (IFs *) malloc(sizeof(IFs));
+								$$ = (struct IFs *) malloc(sizeof(struct IFs));
 								struct IFs i; 
 								i.condition = $3; 
 								i.if_s = $5; 
 								$$ = &i; 
 							}
   | IF LPARENT expr RPARENT statement ELSE statement 	{ 
-								$$ = (IFs *) malloc(sizeof(IFs));
+								$$ = (struct IFs *) malloc(sizeof(struct IFs));
 								struct IFs i; 
 								i.condition = $3; 
 								i.if_s = $5; 
@@ -418,10 +420,10 @@
  /* ########### EXPR ########### */
 
 expr: expr PLUS expr      	{ 
-					$$ = (EXPR *) malloc(sizeof(EXPR));
+					$$ = (struct EXPR *) malloc(sizeof(struct EXPR));
 					struct BINOP b; 
 					struct EXPR e; 
-					e.expresision.binop_expr = (BINOP *) malloc(sizeof(BINOP));
+					e.expression.binop_expr = (struct BINOP *) malloc(sizeof(struct BINOP));
 					b.bi = ePlus; 
 					b.expr1 = $1; 
 					b.expr2 = $3; 
@@ -430,10 +432,10 @@ expr: expr PLUS expr      	{
 					$$ = &e; 
 				}
   | expr MINUS expr     	{ 
-					$$ = (EXPR *) malloc(sizeof(EXPR));
+					$$ = (struct EXPR *) malloc(sizeof(struct EXPR));
 					struct BINOP b; 
 					struct EXPR e; 
-					e.expresision.binop_expr = (BINOP *) malloc(sizeof(BINOP));
+					e.expression.binop_expr = (struct BINOP *) malloc(sizeof(struct BINOP));
 					b.bi = eMinus; 
 					b.expr1 = $1; 
 					b.expr2 = $3; 
@@ -442,10 +444,10 @@ expr: expr PLUS expr      	{
 					$$ = &e; 
 				}
   | expr MULT expr     		{ 
-					$$ = (EXPR *) malloc(sizeof(EXPR));
+					$$ = (struct EXPR *) malloc(sizeof(struct EXPR));
 					struct BINOP b; 
 					struct EXPR e; 
-					e.expresision.binop_expr = (BINOP *) malloc(sizeof(BINOP));
+					e.expression.binop_expr = (struct BINOP *) malloc(sizeof(struct BINOP));
 					b.bi = eMult; 
 					b.expr1 = $1; 
 					b.expr2 = $3; 
@@ -454,10 +456,10 @@ expr: expr PLUS expr      	{
 					$$ = &e; 
 				}
   | expr DIV expr     		{ 
-					$$ = (EXPR *) malloc(sizeof(EXPR));
+					$$ = (struct EXPR *) malloc(sizeof(struct EXPR));
 					struct BINOP b; 
 					struct EXPR e; 
-					e.expresision.binop_expr = (BINOP *) malloc(sizeof(BINOP));
+					e.expression.binop_expr = (struct BINOP *) malloc(sizeof(struct BINOP));
 					b.bi = eDiv; 
 					b.expr1 = $1; 
 					b.expr2 = $3; 
@@ -466,10 +468,10 @@ expr: expr PLUS expr      	{
 					$$ = &e; 
 				}
   | expr LT expr     	 	{ 
-					$$ = (EXPR *) malloc(sizeof(EXPR));
+					$$ = (struct EXPR *) malloc(sizeof(struct EXPR));
 					struct BINOP b; 
 					struct EXPR e; 
-					e.expresision.binop_expr = (BINOP *) malloc(sizeof(BINOP));
+					e.expression.binop_expr = (struct BINOP *) malloc(sizeof(struct BINOP));
 					b.bi = eLT; 
 					b.expr1 = $1; 
 					b.expr2 = $3; 
@@ -478,10 +480,10 @@ expr: expr PLUS expr      	{
 					$$ = &e; 
 				}
   | expr LE expr      		{ 
-					$$ = (EXPR *) malloc(sizeof(EXPR));
+					$$ = (struct EXPR *) malloc(sizeof(struct EXPR));
 					struct BINOP b; 
 					struct EXPR e;
-					e.expresision.binop_expr = (BINOP *) malloc(sizeof(BINOP)); 
+					e.expression.binop_expr = (struct BINOP *) malloc(sizeof(struct BINOP)); 
 					b.bi = eLTE; 
 					b.expr1 = $1; 
 					b.expr2 = $3; 
@@ -490,10 +492,10 @@ expr: expr PLUS expr      	{
 					$$ = &e; 
 				}
   | expr GT expr      		{ 
-					$$ = (EXPR *) malloc(sizeof(EXPR));
+					$$ = (struct EXPR *) malloc(sizeof(struct EXPR));
 					struct BINOP b; 
 					struct EXPR e; 
-					e.expresision.binop_expr = (BINOP *) malloc(sizeof(BINOP)); 
+					e.expression.binop_expr = (struct BINOP *) malloc(sizeof(struct BINOP)); 
 					b.bi = eGT; 
 					b.expr1 = $1; 
 					b.expr2 = $3; 
@@ -502,10 +504,10 @@ expr: expr PLUS expr      	{
 					$$ = &e; 
 				}
   | expr GE expr      		{ 
-					$$ = (EXPR *) malloc(sizeof(EXPR));
+					$$ = (struct EXPR *) malloc(sizeof(struct EXPR));
 					struct BINOP b; 
 					struct EXPR e;
-					e.expresision.binop_expr = (BINOP *) malloc(sizeof(BINOP)); 
+					e.expression.binop_expr = (struct BINOP *) malloc(sizeof(struct BINOP)); 
 					b.bi = eGTE; 
 					b.expr1 = $1; 
 					b.expr2 = $3; 
@@ -514,10 +516,10 @@ expr: expr PLUS expr      	{
 					$$ = &e; 
 				}
   | expr EQ expr     		{ 
-					$$ = (EXPR *) malloc(sizeof(EXPR));
+					$$ = (struct EXPR *) malloc(sizeof(struct EXPR));
 					struct BINOP b; 
 					struct EXPR e; 
-					e.expresision.binop_expr = (BINOP *) malloc(sizeof(BINOP));
+					e.expression.binop_expr = (struct BINOP *) malloc(sizeof(struct BINOP));
 					b.bi = eEQ; 
 					b.expr1 = $1; 
 					b.expr2 = $3; 
@@ -526,10 +528,10 @@ expr: expr PLUS expr      	{
 					$$ = &e; 
 				}
   | expr NE expr     		{ 
-					$$ = (EXPR *) malloc(sizeof(EXPR));
+					$$ = (struct EXPR *) malloc(sizeof(struct EXPR));
 					struct BINOP b; 
 					struct EXPR e; 
-					e.expresision.binop_expr = (BINOP *) malloc(sizeof(BINOP));
+					e.expression.binop_expr = (struct BINOP *) malloc(sizeof(struct BINOP));
 					b.bi = eNEQ; 
 					b.expr1 = $1;
 					b.expr2 = $3; 
@@ -538,44 +540,44 @@ expr: expr PLUS expr      	{
 					$$ = &e; 
 				}
   | MINUS expr     		{ 
-					$$ = (EXPR *) malloc(sizeof(EXPR));
+					$$ = (struct EXPR *) malloc(sizeof(struct EXPR));
 					struct UNOP u; 
 					struct EXPR e; 
-					e.expression.unop_expr = (UNOP *) malloc(sizeof(UNOP));
+					e.expression.unop_expr = (struct UNOP *) malloc(sizeof(struct UNOP));
 					u.u = eNegative; 
 					e.e_expr = eUnop; 
 					e.expression.unop_expr = &u; 
 					$$ = &e; 
 				}
   | INTNUM      		{ 
-					$$ = (EXPR *) malloc(sizeof(EXPR));
+					$$ = (struct EXPR *) malloc(sizeof(struct EXPR));
 					struct EXPR e; 
 					e.e_expr = eIntnum; 
 					e.expression.intnum = $1; 
 					$$ = &e; 
 				}
   | FLOATNUM      		{ 
-					$$ = (EXPR *) malloc(sizeof(EXPR));
+					$$ = (struct EXPR *) malloc(sizeof(struct EXPR));
 					struct EXPR e; 
 					e.e_expr = eFloatnum; 
 					e.expression.floatnum = $1; 
 					$$ = &e; 
 				}
   | ID       			{ 
-					$$ = (EXPR *) malloc(sizeof(EXPR));
+					$$ = (struct EXPR *) malloc(sizeof(struct EXPR));
 					struct EXPR e; 
 					struct IDs i; 
-					e.expression.ID_expr = (IDs *) malloc(sizeof(IDs));
+					e.expression.ID_expr = (struct IDs *) malloc(sizeof(struct IDs));
 					i.ID = $1; 
 					e.e_expr = eId; 
 					e.expression.ID_expr = &i; 
 					$$ = &e; 
 				}
   | ID LBRACKET expr RBRACKET   { 
-					$$ = (EXPR *) malloc(sizeof(EXPR));
+					$$ = (struct EXPR *) malloc(sizeof(struct EXPR));
 					struct EXPR e; 
 					struct IDs i;
-					e.expression.ID_expr = (IDs *) malloc(sizeof(IDs)); 
+					e.expression.ID_expr = (struct IDs *) malloc(sizeof(struct IDs)); 
 					i.ID = $1; 
 					i.expr = $3; 
 					e.e_expr = eId; 
@@ -583,14 +585,14 @@ expr: expr PLUS expr      	{
 					$$ = &e; 
 				}
   | LPARENT expr RPARENT    	{ 
-					$$ = (EXPR *) malloc(sizeof(EXPR));
+					$$ = (struct EXPR *) malloc(sizeof(struct EXPR));
 					struct EXPR e; 
 					e.e_expr = eExpr; 
 					e.expression.bracket = $2; 
 					$$ = &e; 
 				}
   | callStmt     		{ 
-					$$ = (EXPR *) malloc(sizeof(EXPR));
+					$$ = (struct EXPR *) malloc(sizeof(struct EXPR));
 					struct EXPR e; 
 					e.e_expr = eCallExpr; 
 					e.expression.call_expr = $1; 
@@ -602,13 +604,13 @@ expr: expr PLUS expr      	{
  /* ########### ARGLIST ########### */
 
  argList: expr    		{ 
-					$$ = (ARGLIST *) malloc(sizeof(ARGLIST));
+					$$ = (struct ARGLIST *) malloc(sizeof(struct ARGLIST));
 					struct ARGLIST a; 
 					a.expr = $1; 
 					$$ = &a; 
 				}
   | expr COLON argList  	{ 
-					$$ = (ARGLIST *) malloc(sizeof(ARGLIST));
+					$$ = (struct ARGLIST *) malloc(sizeof(struct ARGLIST));
 					struct ARGLIST a; 
 					a.expr = $1; 
 					a.prev = $3; 
