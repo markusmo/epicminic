@@ -91,10 +91,8 @@
 				}
   | decList   			{ 	
 					root = (struct PROGRAM *) malloc(sizeof(struct PROGRAM));
-					struct PROGRAM p; 
-					p.FuncList = NULL; 
-					p.DeclList = $1; 
-					root = &p; 
+					root->FuncList = NULL;
+					root->DeclList = $1;
 				}
   | funcList  			{ 	
 					root = (struct PROGRAM *) malloc(sizeof(struct PROGRAM));
@@ -141,11 +139,9 @@
 
  declaration: type identList SEMICOLON 	{ 
 						$$ = (struct DECLARATION *) malloc(sizeof(struct DECLARATION));
-						struct DECLARATION d; 
-						d.t = $1; 
-						d.ilist = $2; 
-						d.prev = NULL; 
-						$$ = &d; 
+						$$->t = $1; 
+						$$->ilist = $2; 
+						$$->prev = NULL; 
 					};
  
 
@@ -160,16 +156,12 @@
 
   identifier: ID    			{ 
 						$$ = (struct IDENTIFIER *) malloc(sizeof(struct IDENTIFIER));
-						struct IDENTIFIER i; 
-						i.ID = $1; 
-						$$ = &i; 
+						$$->ID = $1; 
 					}
   | ID LBRACKET INTNUM RBRACKET 	{ 
 						$$ = (struct IDENTIFIER *) malloc(sizeof(struct IDENTIFIER));
-						struct IDENTIFIER i; 
-						i.ID = $1; 
-						i.intnum = $3; 
-						$$ = &i; 
+						$$->ID = $1; 
+						$$->intnum = $3; 
 					}
   ;
 
