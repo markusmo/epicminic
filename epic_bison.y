@@ -12,6 +12,7 @@
 %code top{
  #include <stdio.h>
  #include <stdlib.h>
+ #include <string.h>
 
  extern struct PROGRAM *root;
 }
@@ -150,9 +151,10 @@
 
  /* ########### IDENTIFIER ########### */
 
-  identifier: ID    			{ 
+  identifier: ID    			{
+						
 						$$ = (struct IDENTIFIER *) malloc(sizeof(struct IDENTIFIER));
-						$$->ID = $1; 
+						$$->ID = $1;
 					}
   | ID LBRACKET INTNUM RBRACKET 	{ 
 						$$ = (struct IDENTIFIER *) malloc(sizeof(struct IDENTIFIER));
@@ -165,10 +167,10 @@
  /* ########### FUNCTION ########### */
 
  function: type ID LPARENT paramList RPARENT compoundStatement 		{ 
-										printf("function 1\n");
+										printf("%s\n", $2);
 										$$ = (struct FUNCTION *) malloc(sizeof(struct FUNCTION)); 
 										$$->t = $1; 
-										$$->ID = $2; 
+										$$->ID = $2;
 										$$->ParamList = $4; 
 										$$->CStmt = $6; 
 										$$->prev = NULL; 
@@ -177,7 +179,7 @@
 										printf("function 1\n");
 										$$ = (struct FUNCTION *) malloc(sizeof(struct FUNCTION));
 										$$->t = $1; 
-										$$->ID = $2; 
+										$$->ID = $2;
 										$$->CStmt = $5; 
 										$$->prev = NULL;  
 									}

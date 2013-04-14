@@ -23,7 +23,7 @@ id [a-zA-Z][a-zA-Z_0-9]*
 "return"	{ return(RETURN); }
 {number}	{ yylval.ivalue = atoi(yytext); return(INTNUM); }
 {floating}	{ yylval.fvalue = atoi(yytext); return(FLOATNUM); }
-{id}	{yylval.string = yytext; return(ID); }
+{id}	{yylval.string = strdup(yytext); return(ID); }
 "*"	{return(MULT); }
 "/"	{return(DIV); }
 "+"	{return(PLUS); }
