@@ -109,11 +109,9 @@
  /* ########### FUNCLIST ########### */
  
  funcList: function   		{
-					printf("funclist 1\n");
 					$$ = $1; 
 				}
   | funcList function  		{
-					printf("funclist 2\n");
 					$1->prev = $2; 
 					$$ = $1; 
 				}
@@ -155,6 +153,7 @@
 						
 						$$ = (struct IDENTIFIER *) malloc(sizeof(struct IDENTIFIER));
 						$$->ID = $1;
+						$$->intnum = NULL;
 					}
   | ID LBRACKET INTNUM RBRACKET 	{ 
 						$$ = (struct IDENTIFIER *) malloc(sizeof(struct IDENTIFIER));
@@ -167,7 +166,6 @@
  /* ########### FUNCTION ########### */
 
  function: type ID LPARENT paramList RPARENT compoundStatement 		{ 
-										printf("%s\n", $2);
 										$$ = (struct FUNCTION *) malloc(sizeof(struct FUNCTION)); 
 										$$->t = $1; 
 										$$->ID = $2;
@@ -176,10 +174,10 @@
 										$$->prev = NULL; 
 									}
   | type ID LPARENT RPARENT compoundStatement   			{
-										printf("function 1\n");
 										$$ = (struct FUNCTION *) malloc(sizeof(struct FUNCTION));
 										$$->t = $1; 
 										$$->ID = $2;
+										$$-ParamList = NULL;
 										$$->CStmt = $5; 
 										$$->prev = NULL;  
 									}
@@ -192,6 +190,7 @@
 					$$ = (struct PARAMETER *) malloc(sizeof(struct PARAMETER));
 					$$->t = $1; 
 					$$->id = $2; 
+					$$->prev = NULL;
 				}
   | paramList COLON type identifier 	{ 
 					$$ = (struct PARAMETER *) malloc(sizeof(struct PARAMETER)); 
@@ -213,7 +212,8 @@
 
  compoundStatement: LFANCYBRACKET stmtList RFANCYBRACKET   	{
 									$$ = (struct COMPOUNDSTMT *) malloc(sizeof(struct COMPOUNDSTMT));
-									$$->StmtList = $2;  
+									$$->StmtList = $2;
+									$$->DeclList = NULL;
 								}
   |   LFANCYBRACKET decList stmtList RFANCYBRACKET  		{ 
 									$$ = (struct COMPOUNDSTMT *) malloc(sizeof(struct COMPOUNDSTMT));
@@ -225,9 +225,15 @@
 
  /* ########### STMTLIST ########### */
 
- stmtList: statement  { $$ = $1; }
-  | stmtList statement   { $2->prev = $1; $$ = $2; }
-  //| /* empty */  { }  ----> TODO shift / reduce
+ stmtList: statement  	 { 
+			   $$ = $1;
+			   $$->prev = NULL;
+			 }
+  | stmtList statement   { 
+			   $2->prev = $1; 
+			   $$ = $2;
+			 }
+  //| /* empty */  { }  ----> shift/reduce, also makes no sense -> in functions only declarations without any values or return values
   ;
 
  
@@ -282,7 +288,8 @@
 
  assign: ID ASSIGN expr					{ 
 								$$ = (struct ASSIGN *) malloc(sizeof(struct ASSIGN));
-								$$->ID = $1; 
+								$$->ID = $1;
+								$$->index = NULL;
 								$$->expr = $3; 
 							}
 	| ID LBRACKET expr RBRACKET ASSIGN expr 	{ 
@@ -304,7 +311,8 @@
 						}
    | ID LPARENT RPARENT				{
 							$$ = (struct CALL *) malloc(sizeof(struct CALL)); 
-							$$->ID = $1; 
+							$$->ID = $1;
+							$$->arg = NULL;
 						}
    ;
  
@@ -318,7 +326,8 @@
 					}
   | RETURN SEMICOLON    		{ 
 						$$ = (struct EXPR *) malloc(sizeof(struct EXPR));
-						$$->e_expr = eExpr; 
+						$$->e_expr = eExpr;
+						$$->expression.bracket = NULL;
 					}
   ;
  
@@ -352,7 +361,8 @@
  ifStmt: IF LPARENT expr RPARENT statement    		{ 
 								$$ = (struct IFs *) malloc(sizeof(struct IFs));
 								$$->condition = $3; 
-								$$->if_s = $5; 
+								$$->if_s = $5;
+								$$->else_s = NULL;
 							}
   | IF LPARENT expr RPARENT statement ELSE statement 	{ 
 								$$ = (struct IFs *) malloc(sizeof(struct IFs));
@@ -492,7 +502,8 @@ expr: expr PLUS expr      	{
 
  argList: expr    		{ 
 					$$ = (struct ARGLIST *) malloc(sizeof(struct ARGLIST));
-					$$->expr = $1; 
+					$$->expr = $1;
+					$$->prev = NULL;
 				}
   | expr COLON argList  	{ 
 					$$ = (struct ARGLIST *) malloc(sizeof(struct ARGLIST));
