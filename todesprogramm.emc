@@ -1,5 +1,6 @@
 int gEpic;
 float fFloat;
+float fFloat2;
 
 int fun(int a, float b)
 {
@@ -24,7 +25,7 @@ int fun(int a, float b)
 		while (temp > 0)
 		{
 			fFloat = fFloat - 1;
-			temp = temp - 1;
+			temp = -1;
 		}
 		
 		

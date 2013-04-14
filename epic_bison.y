@@ -112,8 +112,8 @@
 					$$ = $1; 
 				}
   | funcList function  		{
-					$1->prev = $2; 
-					$$ = $1; 
+					$2->prev = $1; 
+					$$ = $2; 
 				}
   ;
 
@@ -124,8 +124,8 @@
 					$$ = $1; 
 				}
   | decList declaration  	{ 
-					$1->prev = $2;
-					$$ = $1;
+					$2->prev = $1;
+					$$ = $2;
 				}
   ;
  
@@ -143,7 +143,7 @@
  /* ########### IDENTLIST ########### */
 
  identList: identifier   { $$ = $1; }
-  | identList COLON identifier { $1->prev = $3; }
+  | identList COLON identifier { $3->prev = $1; $$ = $3; }
   ;
  
 
@@ -153,7 +153,7 @@
 						
 						$$ = (struct IDENTIFIER *) malloc(sizeof(struct IDENTIFIER));
 						$$->ID = $1;
-						$$->intnum = NULL;
+						$$->intnum = 0;
 					}
   | ID LBRACKET INTNUM RBRACKET 	{ 
 						$$ = (struct IDENTIFIER *) malloc(sizeof(struct IDENTIFIER));
@@ -177,7 +177,7 @@
 										$$ = (struct FUNCTION *) malloc(sizeof(struct FUNCTION));
 										$$->t = $1; 
 										$$->ID = $2;
-										$$-ParamList = NULL;
+										$$->ParamList = NULL;
 										$$->CStmt = $5; 
 										$$->prev = NULL;  
 									}
@@ -225,14 +225,14 @@
 
  /* ########### STMTLIST ########### */
 
- stmtList: statement  	 { 
-			   $$ = $1;
-			   $$->prev = NULL;
-			 }
-  | stmtList statement   { 
-			   $2->prev = $1; 
-			   $$ = $2;
-			 }
+ stmtList: statement	{
+				$$ = $1;
+			   
+			}
+  | stmtList statement	{ 
+				$2->prev = $1; 
+				$$ = $2;
+			}
   //| /* empty */  { }  ----> shift/reduce, also makes no sense -> in functions only declarations without any values or return values
   ;
 
@@ -242,41 +242,49 @@
  statement: assignStmt  	{ 
 					$$ = (struct STMT *) malloc(sizeof(struct STMT));
 					$$->e_stmt = eAssign; 
-					$$->stmt.assign_s = $1; 
+					$$->stmt.assign_s = $1;
+					$$->prev = NULL;
 				}
   | callStmt 			{ 
 					$$ = (struct STMT *) malloc(sizeof(struct STMT)); 
 					$$->e_stmt = eCall; 
-					$$->stmt.call_s = $1; 
+					$$->stmt.call_s = $1;
+					$$->prev = NULL;
 				}
   | retStmt  			{ 
 					$$ = (struct STMT *) malloc(sizeof(struct STMT));
 					$$->e_stmt = eRet; 
-					$$->stmt.return_s = $1; 
+					$$->stmt.return_s = $1;
+					$$->prev = NULL; 
 				}
   | whileStmt  			{ 
 					$$ = (struct STMT *) malloc(sizeof(struct STMT));
 					$$->e_stmt = eWhile; 
-					$$->stmt.while_s = $1; 
+					$$->stmt.while_s = $1;
+					$$->prev = NULL;
 				}
   | forStmt  			{ 
 					$$ = (struct STMT *) malloc(sizeof(struct STMT));
 					$$->e_stmt = eFor; 
 					$$->stmt.for_s = $1;
+					$$->prev = NULL;
 				}
   | ifStmt  			{ 
 					$$ = (struct STMT *) malloc(sizeof(struct STMT));
 					$$->e_stmt = eIf; 
-					$$->stmt.if_s = $1; 
+					$$->stmt.if_s = $1;
+					$$->prev = NULL;
 				}
   | compoundStatement 		{ 
 					$$ = (struct STMT *) malloc(sizeof(struct STMT));
 					$$->e_stmt = eCompound; 
-					$$->stmt.compound_s = $1; 
+					$$->stmt.compound_s = $1;
+					$$->prev = NULL;
 				}
   | SEMICOLON  			{ 
 					$$ = (struct STMT *) malloc(sizeof(struct STMT));
-					$$->e_stmt = eSemi; 
+					$$->e_stmt = eSemi;
+					$$->prev = NULL;
 
 				}
   ;
