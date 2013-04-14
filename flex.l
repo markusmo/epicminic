@@ -2,6 +2,7 @@
   #include <stdio.h>
   #include <stdlib.h>
   #include "epic_bison.tab.h"
+  extern YYSTYPE yylval;
 %}
 
 digit [0-9]
@@ -20,9 +21,9 @@ id [a-zA-Z][a-zA-Z_0-9]*
 "else"	{return(ELSE); }
 "for"	{return(FOR); }
 "return"	{ return(RETURN); }
-{number}	{ return(INTNUM); }
-{floating}	{ return(FLOATNUM); }
-{id}	{return(ID); }
+{number}	{ yylval.ivalue = atoi(yytext); return(INTNUM); }
+{floating}	{ yylval.fvalue = atoi(yytext); return(FLOATNUM); }
+{id}	{yylval.string = yytext; return(ID); }
 "*"	{return(MULT); }
 "/"	{return(DIV); }
 "+"	{return(PLUS); }
