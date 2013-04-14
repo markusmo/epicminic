@@ -20,7 +20,8 @@
 }
 %union {
  int ivalue;
-     float fvalue;
+ float fvalue;
+ Typee typee;
  char *string;
  struct PROGRAM *prog;
  struct DECLARATION *decl;
@@ -38,7 +39,6 @@
  struct BINOP *binop;
  struct IDs *id;
  struct IDENTIFIER *idenf;
- Typee typee;
 }
 
  %type <typee> type
@@ -76,29 +76,31 @@
  %right COLON
  %left LPARENT SEMICOLON
 
+ %start program
+
 %%
- program: decList funcList  { struct PROGRAM p; p.DeclList = $1; p.FuncList = $2; root = p; $$ = &p; }
-  | decList   { struct PROGRAM p; p.DeclList = $1; root = p; $$ = &p; }
-  | funcList  { struct PROGRAM p; p.FuncList = $1; root = p; $$ = &p; }
-  | /* empty */  { struct PROGRAM p; $$ = &p; }
+ program: decList funcList  { struct PROGRAM p; p.DeclList = $1; p.FuncList = $2; root = p; }
+  | decList   { struct PROGRAM p; p.FuncList = NULL; p.DeclList = $1; root = p; }
+  | funcList  { struct PROGRAM p; p.FuncList = $1; p.DeclList = NULL; root = p; }
+  | /* empty */  { root.FuncList = NULL; root.DeclList = NULL; }
   ;
  
  funcList: function   { $$ = $1; }
-  | funcList function  { $1->prev = $2; }
+  | funcList function  { $2->prev = $1; $$ = $2; }
   ;
  
  decList: declaration  { $$ = $1; }
-  | decList declaration  { $1->prev = $2; }
+  | decList declaration  { struct DECLARATION* d; d = $2; d->prev = $1; $$ = d; }
   ;
  
- declaration: type identList SEMICOLON { struct DECLARATION d; d.t = $1; d.ilist = $2; $$ = &d;  };
+ declaration: type identList SEMICOLON { struct DECLARATION d; d.t = $1; d.ilist = $2; d.prev = NULL; $$ = &d; };
  
  identList: identifier   { $$ = $1; }
   | identList COLON identifier { $1->prev = $3; }
   ;
  
- identifier: ID    { struct IDs i; i.ID = $1; $$ = &i; }
-  | ID LBRACKET expr RBRACKET { struct IDs i; i.ID = $1; i.expr = $3; $$ = &i; }
+ identifier: ID    { struct IDENTIFIER i; i.ID = $1; $$ = &i; }
+  | ID LBRACKET INTNUM RBRACKET { struct IDENTIFIER i; i.ID = $1; i.intnum = $3; $$ = &i; }
   ;
 
  function: type ID LPARENT paramList RPARENT compoundStatement { struct FUNCTION f; f.t = $1; f.ID = $2; f.ParamList = $4; f.CStmt = $6; f.prev = NULL; $$ = &f; }
@@ -115,7 +117,7 @@
  
  compoundStatement: LFANCYBRACKET stmtList RFANCYBRACKET   { struct COMPOUNDSTMT c; c.StmtList = $2; $$ = &c; }
   |   LFANCYBRACKET decList stmtList RFANCYBRACKET  { struct COMPOUNDSTMT c; c.DeclList = $2; c.StmtList = $3; $$ = &c; }
-  ;
+  ;	
  
  stmtList: statement  { $$ = $1; }
   | stmtList statement   { $1->prev = $2; }
@@ -154,17 +156,7 @@
   | IF LPARENT expr RPARENT statement ELSE statement { struct IFs i; i.condition = $3; i.if_s = $5; i.else_s = $7; $$ = &i; }
   ;
  
- expr: expr PLUS expr      { struct BINOP b; struct EXPR e; b.bi = ePlus; b.expr1 = $1; b.expr2 = $3; e.e_expr = eBinop; e.expression.binop_expr = &b; $$ = &e; }
-  | expr MINUS expr     { struct BINOP b; struct EXPR e; b.bi = eMinus; b.expr1 = $1; b.expr2 = $3; e.e_expr = eBinop; e.expression.binop_expr = &b; $$ = &e; }
-  | expr MULT expr     { struct BINOP b; struct EXPR e; b.bi = eMult; b.expr1 = $1; b.expr2 = $3; e.e_expr = eBinop; e.expression.binop_expr = &b; $$ = &e; }
-  | expr DIV expr     { struct BINOP b; struct EXPR e; b.bi = eDiv; b.expr1 = $1; b.expr2 = $3; e.e_expr = eBinop; e.expression.binop_expr = &b; $$ = &e; }
-  | expr LT expr      { struct BINOP b; struct EXPR e; b.bi = eLT; b.expr1 = $1; b.expr2 = $3; e.e_expr = eBinop; e.expression.binop_expr = &b; $$ = &e; }
-  | expr LE expr      { struct BINOP b; struct EXPR e; b.bi = eLTE; b.expr1 = $1; b.expr2 = $3; e.e_expr = eBinop; e.expression.binop_expr = &b; $$ = &e; }
-  | expr GT expr      { struct BINOP b; struct EXPR e; b.bi = eGT; b.expr1 = $1; b.expr2 = $3; e.e_expr = eBinop; e.expression.binop_expr = &b; $$ = &e; }
-  | expr GE expr      { struct BINOP b; struct EXPR e; b.bi = eGTE; b.expr1 = $1; b.expr2 = $3; e.e_expr = eBinop; e.expression.binop_expr = &b; $$ = &e; }
-  | expr EQ expr     { struct BINOP b; struct EXPR e; b.bi = eEQ; b.expr1 = $1; b.expr2 = $3; e.e_expr = eBinop; e.expression.binop_expr = &b; $$ = &e; }
-  | expr NE expr     { struct BINOP b; struct EXPR e; b.bi = eNEQ; b.expr1 = $1; b.expr2 = $3; e.e_expr = eBinop; e..
-  | expr: expr PLUS expr      { struct BINOP b; struct EXPR e; b.bi = ePlus; b.expr1 = $1; b.expr2 = $3; e.e_expr = eBinop; e.expression.binop_expr = &b; $$ = &e; }
+expr: expr PLUS expr      { struct BINOP b; struct EXPR e; b.bi = ePlus; b.expr1 = $1; b.expr2 = $3; e.e_expr = eBinop; e.expression.binop_expr = &b; $$ = &e; }
   | expr MINUS expr     { struct BINOP b; struct EXPR e; b.bi = eMinus; b.expr1 = $1; b.expr2 = $3; e.e_expr = eBinop; e.expression.binop_expr = &b; $$ = &e; }
   | expr MULT expr     { struct BINOP b; struct EXPR e; b.bi = eMult; b.expr1 = $1; b.expr2 = $3; e.e_expr = eBinop; e.expression.binop_expr = &b; $$ = &e; }
   | expr DIV expr     { struct BINOP b; struct EXPR e; b.bi = eDiv; b.expr1 = $1; b.expr2 = $3; e.e_expr = eBinop; e.expression.binop_expr = &b; $$ = &e; }

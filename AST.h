@@ -1,6 +1,6 @@
 
 typedef enum
-{eInt,eFloat} Typee;
+{eInt = 0,eFloat} Typee;
 typedef enum
 {eNegative} Unop;
 typedef enum
