@@ -25,3 +25,7 @@ void printFor(struct FORs *fr);
 void printIf(struct IFs *iff);
 void printDeclaration(struct DECLARATION* decl);
 void printIdentifier(struct IDENTIFIER* identifier);
+
+char* getTypeString(Typee type);
+char* getUnopString(Unop unop);
+char* getBinopString(Binop binop);

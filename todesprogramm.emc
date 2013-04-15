@@ -42,3 +42,8 @@ int func(float a, int b)
 {
 	return a * (b / fFloat) + gEpic - 42;
 }
+
+int func3()
+{
+	return 42;
+}
