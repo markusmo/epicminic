@@ -4,7 +4,7 @@ typedef enum
 typedef enum
 {eNegative} Unop;
 typedef enum
-{eAssign,eCall,eRet,eWhile,eFor,eIf,eCompound,eSemi} Stmt;
+{eAssign,eCall,eRet,eWhile,eDoWhile,eFor,eIf,eCompound,eSemi} Stmt;
 typedef enum
 {eUnop,eBinop,eCallExpr,eIntnum,eFloatnum,eId,eExpr} Expre;
 typedef enum
@@ -62,6 +62,7 @@ struct STMT
 		struct CALL *call_s; //id(arg) 
 		struct EXPR *return_s; //return expr
 		struct WHILEs *while_s; //while()stmt
+		struct DOWHILEs *dowhile_s;//do stmt
 		struct FORs *for_s; //for()stmt
 		struct IFs *if_s;  //if()stmt
 		struct COMPOUNDSTMT *compound_s; // {}

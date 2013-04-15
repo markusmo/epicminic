@@ -34,6 +34,7 @@
  struct CALL *callstmt;
  struct ARGLIST *arglist;
  struct WHILEs *whilestmt;
+ struct DOWHILEs *dostmt;
  struct FORs *forstmt;
  struct IFs *ifstmt;
  struct EXPR *exp;
@@ -57,6 +58,7 @@
  %type <exp> retStmt expr
  %type <prog> program
  %type <idenf> identifier identList
+ %type <dostmt> doWhileStmt
 
  %token <type> INT
  %token <ivalue> INTNUM
@@ -111,9 +113,9 @@
  funcList: function   		{
 					$$ = $1; 
 				}
-  | funcList function  		{
-					$2->prev = $1; 
-					$$ = $2; 
+  | function funcList  		{
+					$1->prev = $2; 
+					$$ = $1; 
 				}
   ;
 
@@ -263,6 +265,12 @@
 					$$->stmt.while_s = $1;
 					$$->prev = NULL;
 				}
+  | doWhileStmt 		{ 
+					$$ = (struct STMT *) malloc(sizeof(struct STMT));
+					$$->e_stmt = eDoWhile; 
+					$$->stmt.dowhile_s = $1;
+					$$->prev = NULL;
+				}
   | forStmt  			{ 
 					$$ = (struct STMT *) malloc(sizeof(struct STMT));
 					$$->e_stmt = eFor; 
@@ -300,7 +308,7 @@
 								$$->index = NULL;
 								$$->expr = $3; 
 							}
-	| ID LBRACKET expr RBRACKET ASSIGN expr 	{ 
+  | ID LBRACKET expr RBRACKET ASSIGN expr 		{ 
 								$$ = (struct ASSIGN *) malloc(sizeof(struct ASSIGN));
 								$$->ID = $1; 
 								$$->index = $3; 
@@ -347,13 +355,14 @@
 								$$->condition = $3; 
 								$$->stmt = $5; 
 							}
-  | DO statement WHILE LPARENT expr RPARENT SEMICOLON  	{ 
-								$$ = (struct DOWHILEs *) malloc(sizeof(struct DOWHILEs));
-								$$->condition = $5; 
-								$$->stmt = $2; 
-							}
   ;
 
+ doWhileStmt: DO statement WHILE LPARENT expr RPARENT SEMICOLON  	{ 
+										$$ = (struct DOWHILEs *) malloc(sizeof(struct DOWHILEs));
+										$$->condition = $5; 
+										$$->stmt = $2; 
+									}
+  ;
  
  /* ########### FORSTMT ########### */
  forStmt: FOR LPARENT assign SEMICOLON expr SEMICOLON assign RPARENT statement 	{ 
