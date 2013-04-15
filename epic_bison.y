@@ -128,8 +128,12 @@
 					$$ = $1; 
 				}
   | decList declaration  	{ 
-					$2->prev = $1;
-					$$ = $2;
+					struct DECLARATION *decl = $1;
+					while(decl->prev != NULL) {
+						decl = decl->prev;		
+					}
+					decl->prev = $2;
+					$$ = $1;
 				}
   ;
  
