@@ -250,7 +250,7 @@
 				$$ = $1;
 			   
 			}
-  | stmtListL statement	{ 
+  | statement stmtListL 	{ 
 				$1->prev = $2; 
 				$$ = $1;
 			}
