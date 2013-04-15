@@ -72,12 +72,13 @@
  %token LPARENT RPARENT LFANCYBRACKET RFANCYBRACKET LBRACKET RBRACKET
  %token SEMICOLON COLON
  
- %right ASSIGN
- %left LE GE EQ NE LT GT
- %right MINUS PLUS DIV MULT
- %right RPARENT ELSE
- %right COLON
- %left LPARENT SEMICOLON
+ %left LPARENT RPARENT
+ %right MINUS
+ %left MULT DIV
+ %left PLUS
+ %left LE GE LT GT
+ %left EQ NE
+ %right ASSIGN ELSE
 
  %start program
 
@@ -125,9 +126,9 @@
  decList: declaration  		{ 
 					$$ = $1; 
 				}
-  | decList declaration  	{ 
-					$2->prev = $1;
-					$$ = $2;
+  | declaration decList 	{ 
+					$1->prev = $2;
+					$$ = $1;
 				}
   ;
  
@@ -144,8 +145,13 @@
 
  /* ########### IDENTLIST ########### */
 
- identList: identifier   { $$ = $1; }
-  | identList COLON identifier { $3->prev = $1; $$ = $3; }
+ identList: identifier   		{ 
+						$$ = $1; 
+					}
+  | identifier COLON identList 		{ 
+						$1->prev = $3; 
+						$$ = $1; 
+					}
   ;
  
 
@@ -188,18 +194,18 @@
 
  /* ########### PARAMLIST ########### */
 
- paramList: type identifier  	{ 
-					$$ = (struct PARAMETER *) malloc(sizeof(struct PARAMETER));
-					$$->t = $1; 
-					$$->id = $2; 
-					$$->prev = NULL;
-				}
-  | paramList COLON type identifier 	{ 
-					$$ = (struct PARAMETER *) malloc(sizeof(struct PARAMETER)); 
-					$$->t = $3; 
-					$$->id = $4; 
-					$$->prev = $1; 
-				}
+ paramList: type identifier  		{ 
+						$$ = (struct PARAMETER *) malloc(sizeof(struct PARAMETER));
+						$$->t = $1; 
+						$$->id = $2; 
+						$$->prev = NULL;
+					}
+  | type identifier COLON paramList  	{ 
+						$$ = (struct PARAMETER *) malloc(sizeof(struct PARAMETER)); 
+						$$->t = $1; 
+						$$->id = $2; 
+						$3->prev = $$; 
+					}
   ;
 
 
@@ -231,9 +237,9 @@
 				$$ = $1;
 			   
 			}
-  | stmtList statement	{ 
-				$2->prev = $1; 
-				$$ = $2;
+  | statement stmtList	{ 
+				$1->prev = $2; 
+				$$ = $1;
 			}
   //| /* empty */  { }  ----> shift/reduce, also makes no sense -> in functions only declarations without any values or return values
   ;
