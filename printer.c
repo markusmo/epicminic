@@ -1,3 +1,11 @@
+/*
+	This file contains functions for printing out the AST
+	in addition the symbol table is created during parsing
+
+	For the purpose of parsing, recursive functions are declared for each struct type
+	If structs are nested, the the functions call the specific function for the next struct
+*/
+
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
@@ -11,10 +19,14 @@ FILE *tableStream;
 FILE* astStream;
 SymbolTable* table;
 
+/*
+	Generates the AST text representation and the symbol table
+	For both files seperate streams are needed - their opening/closing should be handled from the outside
+*/
 void generateOutput(FILE *astStreamPar, FILE *tableStream)
 {
 	astStream = astStreamPar;
-	table = initTable();
+	table = initTable(); /* creates an empty symbol table */
 
 	struct DECLARATION *currentDecl = root->DeclList;
 
@@ -32,7 +44,9 @@ void generateOutput(FILE *astStreamPar, FILE *tableStream)
 		currentFunc = currentFunc->prev;
 	}
 
+	/* wirte the symbol table to the specified stream */
 	printTable(table, tableStream);
+	destroy(table);
 }
 
 void printDeclaration(struct DECLARATION* decl)
@@ -41,8 +55,14 @@ void printDeclaration(struct DECLARATION* decl)
 	newType(table, decl->t);
 	struct IDENTIFIER *currIdent = decl->ilist;
 
+	/* to get the correct amount of colons */
+	int first = 1;
 	while (currIdent != NULL)
 	{
+		if (!first)
+			fprintf(astStream, ",");
+
+		first = 0;
 		printIdentifier(currIdent);
 		currIdent = currIdent->prev;
 	}
@@ -52,22 +72,32 @@ void printDeclaration(struct DECLARATION* decl)
 
 void printFunction(struct FUNCTION *func)
 {
+	/* a function indicates that a new block is comming, so go one level deeper */
+	/* same thing with if, for,... - no more comments for these */
 	goToChild(table, func->ID);
 
 	fprintf(astStream, "%s %s(", getTypeString(func->t), func->ID);
 
 	struct PARAMETER *currPar = func->ParamList;
-	setParam(table, 1);
+	setParam(table, 1); /* activate params in symbol table, because paramList is coming */
+	int first = 1;
+
 	while (currPar != NULL)
 	{
+		/* to get the correct amount of colons */
+		if (!first)
+			fprintf(astStream, ", ");
+		first = 0;
+
 		printParameter(currPar);
 		currPar = currPar->prev;
 	}
-	setParam(table, 0);
+	setParam(table, 0); /* deactivate params in symbol table again, because paramList is over */
 	fprintf(astStream, ")\n");
 
 	printCompound(func->CStmt);
 
+	/* after all operations leave the block */
 	goToParent(table);
 }
 
@@ -75,7 +105,7 @@ void printParameter(struct PARAMETER *par)
 {
 	fprintf(astStream, "%s ", getTypeString(par->t));
 	printIdentifier(par->id);
-	fprintf(astStream, ", ");
+	
 }
 
 void printCompound(struct COMPOUNDSTMT *comp)
@@ -102,6 +132,7 @@ void printCompound(struct COMPOUNDSTMT *comp)
 
 void printStatement(struct STMT *stmt, int isAlreadyDeeper)
 {
+	/* statement needs to be switched, because multiple possibilities are available */
 	switch (stmt->e_stmt)
 	{
 		case eAssign:
@@ -144,6 +175,7 @@ void printStatement(struct STMT *stmt, int isAlreadyDeeper)
 
 void printExpr(struct EXPR *expr)
 {
+	/* expressions need to be switched, because multiple possibilities are available */
 	switch(expr->e_expr)
 	{
 		case eUnop:
@@ -205,13 +237,11 @@ void printIDs(struct IDs *ids)
 		printExpr(ids->expr);
 		fprintf(astStream, "]");
 	}
-	fprintf(astStream, " ");
 }
 
 void printArgument(struct ARGLIST *arg)
 {
 	printExpr(arg->expr);
-	fprintf(astStream, ", ");
 }
 
 void printAssign(struct ASSIGN *assign)
@@ -232,8 +262,15 @@ void printCall(struct CALL *call)
 	fprintf(astStream, "%s(", call->ID);
 
 	struct ARGLIST *currArg = call->arg;
+	int first = 1;
+
 	while (currArg != NULL)
 	{
+		/* to get the correct amount of colons */
+		if (!first)
+			fprintf(astStream, ", ");
+		first = 0;
+
 		printArgument(currArg);
 		currArg = currArg->prev;
 	}
@@ -292,7 +329,9 @@ void printIf(struct IFs *iff)
 
 	printStatement(iff->if_s, 1);
 
+	/* else can be NULL and is a seperate block, so the block needs to be left before */
 	goToParent(table);
+
 	if (iff->else_s != NULL)
 	{
 		goToChild(table, "else");
@@ -309,19 +348,25 @@ void printIdentifier(struct IDENTIFIER* identifier)
 	addEntry(table, identifier->ID, identifier->intnum);
 
 	if (identifier->intnum == 0)
-		fprintf(astStream, "%s ", identifier->ID);
+		fprintf(astStream, "%s", identifier->ID);
 	else
-		fprintf(astStream, "%s[%d] ", identifier->ID, identifier->intnum);
+		fprintf(astStream, "%s[%d]", identifier->ID, identifier->intnum);
 	
 }
 
+/*
+	Helper functions, to convert enum entries to strings
+*/
+
 char* getTypeString(Typee type)
 {
+	/* only int and float at the moment */
 	return type == eInt ? "int" : "float";
 }
 
 char* getUnopString(Unop unop)
 {
+	/* only '-' at the moment */
 	return "-";
 }
 

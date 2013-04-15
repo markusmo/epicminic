@@ -27,6 +27,8 @@ typedef struct SymbolTable {
 } SymbolTable;
 
 SymbolTable* initTable();
+
+void destroy(SymbolTable* table);
 void printTable(SymbolTable* table, FILE* stream);
 void printHeadline(TableHeadline* head, FILE* stream);
 void printEntry(TableEntry* entry, FILE* stream);

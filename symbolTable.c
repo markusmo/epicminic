@@ -4,8 +4,12 @@
 
 #include "symbolTable.h"
 
+/*
+	Creates a new symbol table
+*/
 SymbolTable* initTable()
 {
+	/* allocate the space for the table and set all pointers to NULL */
 	SymbolTable* table = (SymbolTable*) malloc(sizeof(SymbolTable));
 	table->global = (TableHeadline*) malloc(sizeof(TableHeadline));
 	table->global->name = "GLOBAL";
@@ -17,6 +21,14 @@ SymbolTable* initTable()
 	return table;
 }
 
+void destroy(SymbolTable* table)
+{
+	free(table);
+}
+
+/*
+	recursive helper function for printing
+*/
 void printEntry(TableEntry* entry, FILE* stream)
 {
 	if (entry->array > 0)
@@ -30,6 +42,9 @@ void printEntry(TableEntry* entry, FILE* stream)
 		printEntry(entry->next, stream);
 }
 
+/*
+	recursive helper function for printing
+*/
 void printHeadline(TableHeadline* head, FILE* stream)
 {
 	if (head->firstEntry != NULL)
@@ -49,6 +64,9 @@ void printHeadline(TableHeadline* head, FILE* stream)
 		printHeadline(head->next, stream);
 }
 
+/*
+	prints the table t a given output stream
+*/
 void printTable(SymbolTable* table, FILE* stream)
 {
 	if (table != NULL && table->global != NULL)
@@ -57,25 +75,39 @@ void printTable(SymbolTable* table, FILE* stream)
 	}
 }
 
+/*
+	changes the type of new added variables
+*/
 void newType(SymbolTable* table, Typee type)
 {
 	table->currType = type;
 }
 
+/*
+	Leaves the current level and goes one up
+*/
 void goToParent(SymbolTable* table)
 {
 	table->current = table->current->parent;
 }
 
+/*
+	indicates wheter new variables are stored as parameters or variables
+*/
 void setParam(SymbolTable* table, int isParam)
 {
 	table->isParam = isParam;
 }
 
+/*
+	adds an entry to the current head of the list
+	if array is set to 0, the variable is an scalar
+*/
 void addEntry(SymbolTable* table, char* name, int array)
 {
 	int count = 1;
 	
+	/* first entry needs to be treated seperatly, because its predecessor is not an entry */
 	if (table->current->firstEntry == NULL)
 	{
 		table->current->firstEntry = (TableEntry*) malloc(sizeof(TableEntry));
@@ -89,7 +121,7 @@ void addEntry(SymbolTable* table, char* name, int array)
 	else
 	{
 		TableEntry* currEntry = table->current->firstEntry;
-		count++;
+		count++; /* one is already skipped */
 
 		while (currEntry->next != NULL)
 		{
@@ -107,6 +139,10 @@ void addEntry(SymbolTable* table, char* name, int array)
 	}
 }
 
+/*
+	enters a deeper level in the parsing structure
+	the entered name will be appended to the name of the current node
+*/
 void goToChild(SymbolTable* table, char* name)
 {
 	TableHeadline* currPrev = table->current;
@@ -116,8 +152,10 @@ void goToChild(SymbolTable* table, char* name)
 
 	currPrev->next = (TableHeadline*) malloc(sizeof(TableHeadline));
 	currPrev->next->parent = table->current;
+	/* reserve space for concated string */
 	char* newName = malloc(strlen(table->current->name) + strlen(name) + 4);
 	sprintf(newName, "%s - %s", table->current->name, name);
+
 	currPrev->next->name = newName;
 	currPrev->next->firstEntry = NULL;
 	currPrev->next->next = NULL;

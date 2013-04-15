@@ -32,8 +32,7 @@ int fun(int a, float b, float c)
 		}
 
 		{
-			int inComp;
-			float floatIn;
+			int inComp, iComp2, iComp3;
 			inComp = 3;
 		}
 		
@@ -43,12 +42,6 @@ int fun(int a, float b, float c)
 		{
 			temp2 = func(2, arr[i], temp2);
 		} while (temp2 < gEpic);
-	}
-
-
-	{
-		int inComp;
-		inComp = 3;
 	}
 }
 
