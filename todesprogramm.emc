@@ -2,7 +2,7 @@ int gEpic;
 float fFloat;
 float fFloat2;
 
-int fun(int a, float b)
+int fun(int a, float b, float c)
 {
 	int temp;
 	int i;
@@ -33,7 +33,7 @@ int fun(int a, float b)
 		
 		do
 		{
-			temp2 = func(2, arr[i]);
+			temp2 = func(2, arr[i], temp2);
 		} while (temp2 < gEpic);
 	}
 }

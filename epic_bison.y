@@ -19,6 +19,7 @@
 %code requires{
  #include "AST.h"
 }
+
 %union {
  int ivalue;
  float fvalue;
@@ -126,9 +127,9 @@
  decList: declaration  		{ 
 					$$ = $1; 
 				}
-  | declaration decList 	{ 
-					$1->prev = $2;
-					$$ = $1;
+  | decList declaration  	{ 
+					$2->prev = $1;
+					$$ = $2;
 				}
   ;
  
@@ -204,7 +205,7 @@
 						$$ = (struct PARAMETER *) malloc(sizeof(struct PARAMETER)); 
 						$$->t = $1; 
 						$$->id = $2; 
-						$3->prev = $$; 
+						$$->prev = $4; 
 					}
   ;
 
@@ -531,7 +532,7 @@ expr: expr PLUS expr      	{
   | expr COLON argList  	{ 
 					$$ = (struct ARGLIST *) malloc(sizeof(struct ARGLIST));
 					$$->expr = $1; 
-					$3->prev = $$; 
+					$$->prev = $3; 
 				}
   ;
 
