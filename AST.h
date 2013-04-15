@@ -97,6 +97,13 @@ struct WHILEs
 	struct STMT *stmt;
 
 };
+////do stmt; while(condition);
+struct DOWHILEs 
+{
+	struct EXPR *condition;
+	struct STMT *stmt;
+
+};
 /// for(init;condition;next)stmt;
 struct FORs
 {
