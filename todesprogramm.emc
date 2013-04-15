@@ -4,6 +4,7 @@ float fFloat2;
 
 int fun(int a, float b, float c)
 {
+	asdf;
 	int temp;
 	int i;
 	float arr[10];

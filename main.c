@@ -34,8 +34,3 @@ int main(int argc, char *argv[])
 	
 	return 0;
 }
-
-void yyerror(char * str)
-{
-    fprintf(stderr, "Error: %s\n", str);
-}

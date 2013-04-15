@@ -3,6 +3,8 @@
   #include <stdlib.h>
   #include "epic_bison.tab.h"
   extern YYSTYPE yylval;
+
+  int linenumber = 1;
 %}
 
 digit [0-9]
@@ -43,5 +45,11 @@ id [a-zA-Z][a-zA-Z_0-9]*
 "]"	{return(RBRACKET); }
 ";"	{return(SEMICOLON); }
 ","	{return(COLON); }
-[ \t\n\r] {/* skip whitespace*/ }
+[ \t\r] {/* skip whitespace*/ }
+[\n]	{ linenumber++; }
 %%
+
+void yyerror(char * str)
+{
+    fprintf(stderr, "%s in line %d\n", str, linenumber);
+}
