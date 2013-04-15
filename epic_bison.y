@@ -72,12 +72,13 @@
  %token LPARENT RPARENT LFANCYBRACKET RFANCYBRACKET LBRACKET RBRACKET
  %token SEMICOLON COLON
  
- %right ASSIGN
- %left LE GE EQ NE LT GT
- %right MINUS PLUS DIV MULT
- %right RPARENT ELSE
- %right COLON
- %left LPARENT SEMICOLON
+ %left LPARENT RPARENT
+ %right MINUS
+ %left MULT DIV
+ %left PLUS
+ %left LE GE LT GT
+ %left EQ NE
+ %right ASSIGN ELSE
 
  %start program
 
