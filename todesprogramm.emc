@@ -30,7 +30,12 @@ int fun(int a, float b, float c)
 			fFloat = fFloat - 1;
 			temp = -1;
 		}
-		
+
+		{
+			int inComp;
+			float floatIn;
+			inComp = 3;
+		}
 		
 		temp2 = fFloat / 5;
 		

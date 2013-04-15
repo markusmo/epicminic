@@ -36,15 +36,17 @@ void printHeadline(TableHeadline* head, FILE* stream)
 	{
 		fprintf(stream, "Function name: %s\n", head->name);
 		fprintf(stream, "count\t\tType\t\tName\t\tArray\t\tRole\n");
-
+		
 		printEntry(head->firstEntry, stream);
 
-		if (head->child != NULL)
-			printHeadline(head->child, stream);
-
-		if (head->next != NULL)
-			printHeadline(head->next, stream);
+		fprintf(stream, "\n");
 	}
+
+	if (head->child != NULL)
+		printHeadline(head->child, stream);
+
+	if (head->next != NULL)
+		printHeadline(head->next, stream);
 }
 
 void printTable(SymbolTable* table, FILE* stream)

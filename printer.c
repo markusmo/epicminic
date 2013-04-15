@@ -32,7 +32,7 @@ void generateOutput(FILE *astStreamPar, FILE *tableStream)
 		currentFunc = currentFunc->prev;
 	}
 
-	printTable(table, astStream);
+	printTable(table, tableStream);
 }
 
 void printDeclaration(struct DECLARATION* decl)
@@ -130,11 +130,11 @@ void printStatement(struct STMT *stmt, int isAlreadyDeeper)
 			printIf(stmt->stmt.if_s);
 			break;
 		case eCompound:
-			//if (!isAlreadyDeeper)
-				//goToChild(table, "compound");
+			if (!isAlreadyDeeper)
+				goToChild(table, "compound");
 			printCompound(stmt->stmt.compound_s);
-			//if (!isAlreadyDeeper)
-			//	goToParent(table);
+			if (!isAlreadyDeeper)
+				goToParent(table);
 			break;
 		case eSemi:
 			fprintf(astStream, ";\n");
