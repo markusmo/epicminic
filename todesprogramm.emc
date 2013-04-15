@@ -20,6 +20,10 @@ int fun(int a, float b, float c)
 		arr[i] = gEpic / i;
 		fFloat = gEpic * i;
 		
+		{
+			int inComp;
+		}
+
 		temp = i * i;
 		
 		while (temp > 0)

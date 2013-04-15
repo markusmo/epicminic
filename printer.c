@@ -1,13 +1,19 @@
+#include <stdio.h>
+#include <ctype.h>
+#include <string.h>
+
 #include "printer.h"
+#include "symbolTable.h"
 
 extern struct PROGRAM *root;
 
-FILE *astStream;
+FILE *tableStream;
+FILE* astStream;
 SymbolTable* table;
 
-void asdf(FILE *stream)
+void generateOutput(FILE *astStreamPar, FILE *tableStream)
 {
-	astStream = stream;
+	astStream = astStreamPar;
 	table = initTable();
 
 	struct DECLARATION *currentDecl = root->DeclList;
@@ -25,11 +31,12 @@ void asdf(FILE *stream)
 		printFunction(currentFunc);
 		currentFunc = currentFunc->prev;
 	}
+
+	printTable(table, astStream);
 }
 
 void printDeclaration(struct DECLARATION* decl)
 {
-	printf("DECLARATION, type: %d \n", (int)decl->t);
 	fprintf(astStream, "%s ", getTypeString(decl->t));
 	newType(table, decl->t);
 	struct IDENTIFIER *currIdent = decl->ilist;
@@ -45,26 +52,27 @@ void printDeclaration(struct DECLARATION* decl)
 
 void printFunction(struct FUNCTION *func)
 {
-	printf("IDENTIFIER, Type: %d, ID: %s \n", (int)func->t, func->ID);
+	goToChild(table, func->ID);
 
 	fprintf(astStream, "%s %s(", getTypeString(func->t), func->ID);
 
 	struct PARAMETER *currPar = func->ParamList;
-
+	setParam(table, 1);
 	while (currPar != NULL)
 	{
 		printParameter(currPar);
 		currPar = currPar->prev;
 	}
-
+	setParam(table, 0);
 	fprintf(astStream, ")\n");
 
 	printCompound(func->CStmt);
+
+	goToParent(table);
 }
 
 void printParameter(struct PARAMETER *par)
 {
-	printf("PARAMETER, type: %d \n", (int)par->t);
 	fprintf(astStream, "%s ", getTypeString(par->t));
 	printIdentifier(par->id);
 	fprintf(astStream, ", ");
@@ -72,7 +80,6 @@ void printParameter(struct PARAMETER *par)
 
 void printCompound(struct COMPOUNDSTMT *comp)
 {
-	printf("COMPOUND \n");
 	fprintf(astStream, "{\n");
 	struct DECLARATION *currDecl = comp->DeclList;
 
@@ -86,17 +93,15 @@ void printCompound(struct COMPOUNDSTMT *comp)
 
 	while (currStmt != NULL)
 	{
-		printStatement(currStmt);
+		printStatement(currStmt, 0);
 		currStmt = currStmt->prev;
 	}
 
 	fprintf(astStream, "}\n");
 }
 
-void printStatement(struct STMT *stmt)
+void printStatement(struct STMT *stmt, int isAlreadyDeeper)
 {
-	printf("STATEMENT, type: %d \n", (int)stmt->e_stmt);
-
 	switch (stmt->e_stmt)
 	{
 		case eAssign:
@@ -125,7 +130,11 @@ void printStatement(struct STMT *stmt)
 			printIf(stmt->stmt.if_s);
 			break;
 		case eCompound:
+			if (!isAlreadyDeeper)
+				goToChild(table, "compound");
 			printCompound(stmt->stmt.compound_s);
+			if (!isAlreadyDeeper)
+				goToParent(table);
 			break;
 		case eSemi:
 			fprintf(astStream, ";\n");
@@ -135,8 +144,6 @@ void printStatement(struct STMT *stmt)
 
 void printExpr(struct EXPR *expr)
 {
-	printf("EXPRESSION \n");
-	
 	switch(expr->e_expr)
 	{
 		case eUnop:
@@ -167,26 +174,22 @@ void printExpr(struct EXPR *expr)
 
 void printInt(int i)
 {
-	printf("INT %d\n", i);
 	fprintf(astStream, "%d", i);
 }
 
 void printFloat(float f)
 {
-	printf("FLOAT %f\n", f);
 	fprintf(astStream, "%f", f);
 }
 
 void printUnop(struct UNOP *un)
 {
-	printf("UNOP, operator: %d \n", (int)un->u);
 	fprintf(astStream, "%s", getUnopString(un->u));
 	printExpr(un->expr);
 }
 
 void printBinop(struct BINOP *bin)
 {
-	printf("BINOP, operator: %d  \n", (int)bin->bi);
 	printExpr(bin->expr1);
 	fprintf(astStream, "%s", getBinopString(bin->bi));
 	printExpr(bin->expr2);
@@ -194,12 +197,10 @@ void printBinop(struct BINOP *bin)
 
 void printIDs(struct IDs *ids)
 {
-	printf("IDs, ID: %s\n", ids->ID);
 	fprintf(astStream, "%s", ids->ID);
 
 	if (ids->expr != NULL)
 	{
-		printf("ARRAY \n");
 		fprintf(astStream, "[");
 		printExpr(ids->expr);
 		fprintf(astStream, "]");
@@ -209,19 +210,16 @@ void printIDs(struct IDs *ids)
 
 void printArgument(struct ARGLIST *arg)
 {
-	printf("ARGUMENT \n");
 	printExpr(arg->expr);
 	fprintf(astStream, ", ");
 }
 
 void printAssign(struct ASSIGN *assign)
 {
-	printf("ASSIGN ID: %s \n", assign->ID);
 	fprintf(astStream, "%s", assign->ID);
 	if (assign->index != NULL)
 	{
 		fprintf(astStream, "[");
-		printf("ARRAY \n");
 		printExpr(assign->index);
 		fprintf(astStream, "]");
 	}
@@ -231,7 +229,6 @@ void printAssign(struct ASSIGN *assign)
 
 void printCall(struct CALL *call)
 {
-	printf("CALL ID \n", call->ID);
 	fprintf(astStream, "%s(", call->ID);
 
 	struct ARGLIST *currArg = call->arg;
@@ -246,26 +243,33 @@ void printCall(struct CALL *call)
 
 void printWhile(struct WHILEs *whil)
 {
-	printf("WHILE \n");
+	goToChild(table, "while");
+
 	fprintf(astStream, "while(");
 	printExpr(whil->condition);
 	fprintf(astStream, ")\n");
-	printStatement(whil->stmt);
+	printStatement(whil->stmt, 1);
+
+	goToParent(table);
 }
 
 void printDoWhile(struct DOWHILEs *dowhile)
 {
-	printf("DO WHILE \n");
+	goToChild(table, "while");
+
 	fprintf(astStream, "do\n");
-	printStatement(dowhile->stmt);
+	printStatement(dowhile->stmt, 1);
 	fprintf(astStream, "while(");
 	printExpr(dowhile->condition);
 	fprintf(astStream, ");\n");
+
+	goToParent(table);
 }
 
 void printFor(struct FORs *fr)
 {
-	printf("FOR \n");
+	goToChild(table, "for");
+
 	fprintf(astStream, "for(");
 	printAssign(fr->init);
 	fprintf(astStream, ";");
@@ -273,29 +277,36 @@ void printFor(struct FORs *fr)
 	fprintf(astStream, ";");
 	printAssign(fr->next);
 	fprintf(astStream, ")\n");
-	printStatement(fr->stmt);
+	printStatement(fr->stmt, 1);
+
+	goToParent(table);
 }
 
 void printIf(struct IFs *iff)
 {
-	printf("IF \n");
+	goToChild(table, "if");
+
 	fprintf(astStream, "if (");
 	printExpr(iff->condition);
 	fprintf(astStream, ")\n");
 
-	printStatement(iff->if_s);
+	printStatement(iff->if_s, 1);
+
+	goToParent(table);
 	if (iff->else_s != NULL)
 	{
-		printf("ELSE \n");
+		goToChild(table, "else");
+		
 		fprintf(astStream, "else\n");
-		printStatement(iff->else_s);
+		printStatement(iff->else_s, 1);
+
+		goToParent(table);
 	}
 }
 
 void printIdentifier(struct IDENTIFIER* identifier)
 {
-	printf("IDENTIFIER, ID: %s, num: %d \n", identifier->ID, identifier->intnum);
-	addEntry(table, identifier->ID, identifier->intnum, eVar);
+	addEntry(table, identifier->ID, identifier->intnum);
 
 	if (identifier->intnum == 0)
 		fprintf(astStream, "%s ", identifier->ID);
@@ -339,9 +350,4 @@ char* getBinopString(Binop binop)
 		case eNEQ:
 			return "!=";
 	}
-}
-
-void printSymbolTable(FILE *stream)
-{
-
 }

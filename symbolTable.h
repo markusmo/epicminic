@@ -1,15 +1,13 @@
-
-
-typedef enum {
-	eVar, ePar
-} Role; 
-
+#if !defined(AST)
+#define AST
+#include "AST.h"
+#endif
 typedef struct TableEntry{
 	int count;
 	Typee type;
 	char* name;
 	int array;
-	Role role;
+	int isParam;
 	struct TableEntry* next;
 } TableEntry;
 
@@ -25,10 +23,16 @@ typedef struct SymbolTable {
 	struct TableHeadline* global;
 	struct TableHeadline* current;
 	Typee currType; 
+	int isParam;
 } SymbolTable;
 
 SymbolTable* initTable();
+void printTable(SymbolTable* table, FILE* stream);
+void printHeadline(TableHeadline* head, FILE* stream);
+void printEntry(TableEntry* entry, FILE* stream);
+
+void setParam(SymbolTable* table, int param);
 void newType(SymbolTable* table, Typee type);
 void goToParent(SymbolTable* table);
-void addEntry(SymbolTable* table, char* name, int array, Role role);
+void addEntry(SymbolTable* table, char* name, int array);
 void goToChild(SymbolTable* table, char* name);

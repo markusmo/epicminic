@@ -1,16 +1,14 @@
-#include <stdio.h>
-#include <ctype.h>
-#include <string.h>
+#if !defined(AST)
+#define AST
 #include "AST.h"
-#include "symbolTable.h"
+#endif
 
-void asdf(FILE *stream);
-void printSymbolTable(FILE *stream);
+void generateOutput(FILE *astStreamPar, FILE *tableStream);
 
 void printFunction(struct FUNCTION *func);
 void printParameter(struct PARAMETER *par);
 void printCompound(struct COMPOUNDSTMT *comp);
-void printStatement(struct STMT *stmt);
+void printStatement(struct STMT *stmt, int isAlreadyDeeper);
 void printExpr(struct EXPR *expr);
 void printInt(int i);
 void printFloat(float f);

@@ -1,3 +1,7 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include "symbolTable.h"
 
 SymbolTable* initTable()
@@ -13,6 +17,44 @@ SymbolTable* initTable()
 	return table;
 }
 
+void printEntry(TableEntry* entry, FILE* stream)
+{
+	if (entry->array > 0)
+		fprintf(stream, "%d\t\t%s\t\t%s\t\t%d\t\t%s\n", entry->count, entry->type == 0 ? "int" : "float", 
+			entry->name, entry->array, entry->isParam ? "param" : "var");
+	else
+		fprintf(stream, "%d\t\t%s\t\t%s\t\t \t\t%s\n", entry->count, entry->type == 0 ? "int" : "float", 
+			entry->name, entry->isParam ? "param" : "var");
+
+	if (entry->next != NULL)
+		printEntry(entry->next, stream);
+}
+
+void printHeadline(TableHeadline* head, FILE* stream)
+{
+	if (head->firstEntry != NULL)
+	{
+		fprintf(stream, "Function name: %s\n", head->name);
+		fprintf(stream, "count\t\tType\t\tName\t\tArray\t\tRole\n");
+
+		printEntry(head->firstEntry, stream);
+
+		if (head->child != NULL)
+			printHeadline(head->child, stream);
+
+		if (head->next != NULL)
+			printHeadline(head->next, stream);
+	}
+}
+
+void printTable(SymbolTable* table, FILE* stream)
+{
+	if (table != NULL && table->global != NULL)
+	{
+		printHeadline(table->global, stream);
+	}
+}
+
 void newType(SymbolTable* table, Typee type)
 {
 	table->currType = type;
@@ -23,18 +65,30 @@ void goToParent(SymbolTable* table)
 	table->current = table->current->parent;
 }
 
-void addEntry(SymbolTable* table, char* name, int array, Role role)
+void setParam(SymbolTable* table, int isParam)
+{
+	table->isParam = isParam;
+}
+
+void addEntry(SymbolTable* table, char* name, int array)
 {
 	int count = 1;
+	
 	if (table->current->firstEntry == NULL)
 	{
 		table->current->firstEntry = (TableEntry*) malloc(sizeof(TableEntry));
+		table->current->firstEntry->name = name;
+		table->current->firstEntry->count = count;
+		table->current->firstEntry->type = table->currType;
+		table->current->firstEntry->array = array;
+		table->current->firstEntry->isParam = table->isParam;
 		table->current->firstEntry->next = NULL;
 	}
 	else
 	{
 		TableEntry* currEntry = table->current->firstEntry;
-		
+		count++;
+
 		while (currEntry->next != NULL)
 		{
 			currEntry = currEntry->next;
@@ -46,7 +100,7 @@ void addEntry(SymbolTable* table, char* name, int array, Role role)
 		currEntry->next->count = count;
 		currEntry->next->type = table->currType;
 		currEntry->next->array = array;
-		currEntry->next->role = role;
+		currEntry->next->isParam = table->isParam;
 		currEntry->next->next = NULL;
 	}
 }
