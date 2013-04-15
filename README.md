@@ -17,6 +17,13 @@
 
 ######################################################################################
 
+Created by:
+	Stefan Dunst - 2013319130
+	Michael Faißt - 2013319112
+	Markus Mohanty - 2013319107
+
+######################################################################################
+
 To build just type "make". This will generate a "epic_parser" excecutable.
 
 Usage
