@@ -348,7 +348,7 @@
 								$$->stmt = $5; 
 							}
   | DO statement WHILE LPARENT expr RPARENT SEMICOLON  	{ 
-								$$ = (struct WHILEs *) malloc(sizeof(struct WHILEs));
+								$$ = (struct DOWHILEs *) malloc(sizeof(struct DOWHILEs));
 								$$->condition = $5; 
 								$$->stmt = $2; 
 							}
