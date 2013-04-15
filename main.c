@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
 	if(!yyparse())
 	{
 		printf("\nDone\n");
-		asdf(yyout);
+		generateOutput(yyout, yyout);
 	}
 	else
 	{
