@@ -2,6 +2,7 @@
 #include <ctype.h>
 #include <string.h>
 #include "AST.h"
+#include "symbolTable.h"
 
 void asdf(FILE *stream);
 void printSymbolTable(FILE *stream);

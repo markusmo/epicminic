@@ -3,27 +3,27 @@
 extern struct PROGRAM *root;
 
 FILE *astStream;
+SymbolTable* table;
 
 void asdf(FILE *stream)
 {
 	astStream = stream;
-	if (root->DeclList != NULL)
+	table = initTable();
+
+	struct DECLARATION *currentDecl = root->DeclList;
+
+	while (currentDecl != NULL)
 	{
-		struct DECLARATION *currentDecl = root->DeclList;
+		printDeclaration(currentDecl);
+		currentDecl = currentDecl->prev;
+	}
 
-		while (currentDecl != NULL)
-		{
-			printDeclaration(currentDecl);
-			currentDecl = currentDecl->prev;
-		} 
+	struct FUNCTION *currentFunc = root->FuncList;
 
-		struct FUNCTION *currentFunc = root->FuncList;
-
-		while (currentFunc != NULL)
-		{
-			printFunction(currentFunc);
-			currentFunc = currentFunc->prev;
-		} 
+	while (currentFunc != NULL)
+	{
+		printFunction(currentFunc);
+		currentFunc = currentFunc->prev;
 	}
 }
 
@@ -31,7 +31,7 @@ void printDeclaration(struct DECLARATION* decl)
 {
 	printf("DECLARATION, type: %d \n", (int)decl->t);
 	fprintf(astStream, "%s ", getTypeString(decl->t));
-
+	newType(table, decl->t);
 	struct IDENTIFIER *currIdent = decl->ilist;
 
 	while (currIdent != NULL)
@@ -295,6 +295,8 @@ void printIf(struct IFs *iff)
 void printIdentifier(struct IDENTIFIER* identifier)
 {
 	printf("IDENTIFIER, ID: %s, num: %d \n", identifier->ID, identifier->intnum);
+	addEntry(table, identifier->ID, identifier->intnum, eVar);
+
 	if (identifier->intnum == 0)
 		fprintf(astStream, "%s ", identifier->ID);
 	else
