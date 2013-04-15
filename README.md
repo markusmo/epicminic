@@ -17,8 +17,13 @@
 
 ######################################################################################
 
-To build just type "make". This will generate a "epic_parser".
+To build just type "make". This will generate a "epic_parser" excecutable.
 
 Usage
 -----
-To use the parser correctly, type **epic_parser _input-filename_ _output-filename_**
+To use the parser correctly, type "./epic_parser _input-filename_"
+	- for example "./epic_parser testProgram.emc"
+
+This command will generate to text files:
+	- table.txt -> Containts the symbol table
+	- tree.txt  -> Containts the textual representation of the AST
