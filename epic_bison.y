@@ -47,7 +47,7 @@
  %type <typee> type
  %type <arglist> argList
  %type <ifstmt> ifStmt
- %type <stmt> statement stmtList
+ %type <stmt> statement stmtList stmtListL
  %type <forstmt> forStmt
  %type <assignstmt> assignStmt assign
  %type <callstmt> callStmt call
@@ -74,7 +74,7 @@
  %token SEMICOLON COLON
  
  %left LPARENT RPARENT
- %right MINUS
+ %right MINUS 
  %left MULT DIV
  %left PLUS
  %left LE GE LT GT
@@ -128,8 +128,12 @@
 					$$ = $1; 
 				}
   | decList declaration  	{ 
-					$2->prev = $1;
-					$$ = $2;
+					struct DECLARATION *decl = $1;
+					while(decl->prev != NULL) {
+						decl = decl->prev;		
+					}
+					decl->prev = $2;
+					$$ = $1;
 				}
   ;
  
@@ -234,15 +238,23 @@
 
  /* ########### STMTLIST ########### */
 
- stmtList: statement	{
+ stmtList:
+    stmtListL		{ 
+				$$ = $1;
+			}
+  | /* empty */ 	{ 
+				$$ = NULL;			
+			};
+
+  stmtListL: statement	{
 				$$ = $1;
 			   
 			}
-  | statement stmtList	{ 
+  | stmtListL statement	{ 
 				$1->prev = $2; 
 				$$ = $1;
 			}
-  //| /* empty */  { }  ----> shift/reduce, also makes no sense -> in functions only declarations without any values or return values
+  //| /* empty */  { }  //----> shift/reduce, also makes no sense -> in functions only declarations without any values or return values
   ;
 
  
@@ -300,7 +312,6 @@
 					$$ = (struct STMT *) malloc(sizeof(struct STMT));
 					$$->e_stmt = eSemi;
 					$$->prev = NULL;
-
 				}
   ;
 
