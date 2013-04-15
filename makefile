@@ -19,7 +19,7 @@ epic_bison.tab.h: epic_bison.y
 	$(CC) -c $<
 
 lex.yy.c: flex.l
-	$(FL) $<
+	$(FL) -l $<
 
 lex.yy.o: lex.yy.c
 	$(CC) -c $<
