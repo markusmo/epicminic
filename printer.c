@@ -194,6 +194,13 @@ void printWhile(struct WHILEs *whil)
 	printStatement(whil->stmt);
 }
 
+void printDoWhile(struct DOWHILEs *dowhile)
+{
+	printf("DO WHILE \n");
+	printExpr(dowhile->condition);
+	printStatement(dowhile->stmt);
+}
+
 void printFor(struct FORs *fr)
 {
 	printf("FOR \n");

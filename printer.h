@@ -20,6 +20,7 @@ void printArgument(struct ARGLIST *arg);
 void printAssign(struct ASSIGN *assign);
 void printCall(struct CALL *call);
 void printWhile(struct WHILEs *whil);
+void printDoWhile(struct DOWHILEs *dowhile);
 void printFor(struct FORs *fr);
 void printIf(struct IFs *iff);
 void printDeclaration(struct DECLARATION* decl);
