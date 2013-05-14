@@ -81,8 +81,17 @@ void printGraph(CFG* cfg)
 	for (i = 0; i < cfg->currentSize; i++)
 	{
 		printf("B%d\n{\n", i);
-		if(cfg->blocks[i].declarations != NULL) { }//printDeclaration(cfg->blocks[i].declarations); }
-		if(cfg->blocks[i].statements != NULL) { printf("%d\n", cfg->blocks[i].statements->e_stmt); }//printStatement(cfg->blocks[i].statements); }
+		if(cfg->blocks[i].declarations != NULL) 
+		{ 
+			//}
+			printDeclaration(cfg->blocks[i].declarations); 
+		}
+		if(cfg->blocks[i].statements != NULL) 
+		{ 
+			printf("%d\n", cfg->blocks[i].statements->e_stmt); //}
+			
+			//printStatement(cfg->blocks[i].statements); 
+		}
 		printf("}\n");
 
 		//TODO all somehow in one loop??

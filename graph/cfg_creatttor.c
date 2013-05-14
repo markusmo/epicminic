@@ -47,9 +47,9 @@ void generateCFG(FILE *cfgStreamPar)
 
 	printGraph(cfg);
 
-	free(cfg->matrix);
-	free(cfg->blocks);
-	free(cfg);
+	//free(cfg->matrix);
+	//free(cfg->blocks);
+	//free(cfg);
 }
 
 void gotoDeclaration(struct DECLARATION* decl)
