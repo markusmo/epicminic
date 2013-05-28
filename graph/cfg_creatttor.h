@@ -3,27 +3,27 @@
 #include "AST.h"
 #endif
 
-void generateOutput(FILE *astStreamPar, FILE *tableStream);
+void generateCFG(FILE *astStreamPar);
 
-void printFunction(struct FUNCTION *func);
-void printParameter(struct PARAMETER *par);
-void printCompound(struct COMPOUNDSTMT *comp);
-void printStatement(struct STMT *stmt, int isAlreadyDeeper);
-void printExpr(struct EXPR *expr);
-void printInt(int i);
-void printFloat(float f);
-void printUnop(struct UNOP *un);
-void printBinop(struct BINOP *bin);
-void printIDs(struct IDs *ids);
-void printArgument(struct ARGLIST *arg);
-void printAssign(struct ASSIGN *assign);
-void printCall(struct CALL *call);
-void printWhile(struct WHILEs *whil);
-void printDoWhile(struct DOWHILEs *dowhile);
-void printFor(struct FORs *fr);
-void printIf(struct IFs *iff);
-void printDeclaration(struct DECLARATION* decl);
-void printIdentifier(struct IDENTIFIER* identifier);
+void gotoFunction(struct FUNCTION *func);
+void gotoParameter(struct PARAMETER *par);
+void gotoCompound(struct COMPOUNDSTMT *comp);
+void gotoStatement(struct STMT *stmt, int isAlreadyDeeper);
+void gotoExpr(struct EXPR *expr);
+void gotoInt(int i);
+void gotoFloat(float f);
+void gotoUnop(struct UNOP *un);
+void gotoBinop(struct BINOP *bin);
+void gotoIDs(struct IDs *ids);
+void gotoArgument(struct ARGLIST *arg);
+void gotoAssign(struct ASSIGN *assign);
+void gotoCall(struct CALL *call);
+void gotoWhile(struct WHILEs *whil);
+void gotoDoWhile(struct DOWHILEs *dowhile);
+void gotoFor(struct FORs *fr);
+void gotoIf(struct IFs *iff);
+void gotoDeclaration(struct DECLARATION* decl);
+void gotoIdentifier(struct IDENTIFIER* identifier);
 
 char* getTypeString(Typee type);
 char* getUnopString(Unop unop);

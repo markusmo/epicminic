@@ -20,22 +20,15 @@ FILE* cfgStream;
 	Generates the AST text representation and the symbol table
 	For both files seperate streams are needed - their opening/closing should be handled from the outside
 */
-void generateOutput(FILE *cfgStreamPar)
+void generateCFG(FILE *cfgStreamPar)
 {
 	cfgStream = cfgStreamPar;
-
-	struct DECLARATION *currentDecl = root->DeclList;
-
-	while (currentDecl != NULL)
-	{
-		gotoDeclaration(currentDecl);
-		currentDecl = currentDecl->prev;
-	}
 
 	struct FUNCTION *currentFunc = root->FuncList;
 
 	while (currentFunc != NULL)
 	{
+		fprintf(cfgStream, "%s\n", currentFunc->ID);
 		gotoFunction(currentFunc);
 		currentFunc = currentFunc->prev;
 	}
