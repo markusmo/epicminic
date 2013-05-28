@@ -33,6 +33,8 @@ int main(int argc, char *argv[])
 
 		FILE* astFile = fopen("tree.txt", "w");
 		FILE* tableFile = fopen("table.txt", "w");
+		FILE* cfaFile = fopen("CFA.out", "w");
+		FILE* lifenessFile = fopen("Liveness.out", "w");
 		
 		/*
 		check if file to parse is opened
@@ -48,6 +50,7 @@ int main(int argc, char *argv[])
 		{
 			printf("'%s' successfully parsed. Tree in 'tree.txt', symboltable in 'table.txt'\n",argv[1]);
 			generateOutput(astFile, tableFile);
+			generateCFGs(cfaFile, lifenessFile);
 		}
 		/*
 		when error occured, print
