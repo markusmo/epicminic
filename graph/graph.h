@@ -7,7 +7,7 @@ typedef struct CFG {
 	int currentEntries;
 } CFG;
 
-void createCFG(CFG* cfg);
+void initCFG(CFG* cfg);
 void addBlock(CFG* cfg, Block* block);
 void addConnection(CFG* cfg, int start, int end);
 void doubleArray(CFG* cfg);
