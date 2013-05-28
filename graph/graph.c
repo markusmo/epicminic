@@ -59,3 +59,35 @@ void doubleArray(CFG* cfg)
 	cfg->currentSize = newSize;
 	cfg->blocks = newBlocks;
 }
+
+void printGraph(CFG* cfg)
+{
+	int i;
+	for (i = 0; i < cfg->currentSize; i++)
+	{
+		printf("B%d\n{\n", i);
+		printDeclaration(cfg->blocks[i].declarations);
+		printStatements(cfg->blocks[i].statements);
+		printf("}\n");
+
+		//TODO all somehow in one loop??
+		printf("Predecessor: ");
+		int j;
+		for (j = 0; j < cfg->currentSize; j++)
+		{
+			if (cfg->matrix[j][cfg->blocks[i].nr] == 1)
+			{
+				printf("B%d, ", j);
+			}
+		}
+		printf("\nSuccessor: ");
+		for (j = 0; j < cfg->currentSize; j++)
+		{
+			if (cfg->matrix[cfg->blocks[i].nr][j] == 1)
+			{
+				printf("B%d, ", j);
+			}
+		}
+		printf("\n\n");
+	}
+}
