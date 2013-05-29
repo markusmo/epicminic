@@ -31,10 +31,10 @@ int main(int argc, char *argv[])
 		*/
    		yyin = fopen(argv[1],"r");
 
-		FILE* astFile = fopen("tree.txt", "w");
-		FILE* tableFile = fopen("table.txt", "w");
-		FILE* cfaFile = fopen("CFA.out", "w");
-		FILE* lifenessFile = fopen("Liveness.out", "w");
+		FILE* astFile = fopen("./output/tree.txt", "w");
+		FILE* tableFile = fopen("./output/table.txt", "w");
+		FILE* cfaFile = fopen("./output/CFA.out", "w");
+		FILE* lifenessFile = fopen("./output/Liveness.out", "w");
 		
 		/*
 		check if file to parse is opened
@@ -64,6 +64,8 @@ int main(int argc, char *argv[])
 		*/
 		fclose(astFile);
 		fclose(tableFile);
+		fclose(cfaFile);
+		fclose(lifenessFile);
 		fclose(yyin);
 	}
 	/*

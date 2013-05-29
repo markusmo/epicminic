@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "graph.h"
 
@@ -41,7 +42,7 @@ void doubleArray(CFG* cfg)
 	int i;
 	int oldRealSize = cfg->currentSize * sizeof(Block);
 
-	memcopy(newBlocks, cfg->blocks, oldRealSize);
+	memcpy(newBlocks, cfg->blocks, oldRealSize);
 
 	for (i = 0; i < newSize; i++)
 	{
@@ -49,7 +50,7 @@ void doubleArray(CFG* cfg)
 		
 		if (i < cfg->currentSize)
 		{
-			memcopy(newMatrix[i], cfg->matrix[i], oldRealSize);
+			memcpy(newMatrix[i], cfg->matrix[i], oldRealSize);
 			free(cfg->matrix[i]);
 		}
 	}
@@ -69,7 +70,7 @@ void printGraph(CFG* cfg)
 	{
 		printf("B%d\n{\n", i);
 		printDeclaration(cfg->blocks[i].declarations);
-		printStatements(cfg->blocks[i].statements);
+		printStatement(cfg->blocks[i].statements);
 		printf("}\n");
 
 		//TODO all somehow in one loop??

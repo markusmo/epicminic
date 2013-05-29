@@ -3,11 +3,11 @@
 #include <string.h>
 #if !defined(BLOCK)
 #define BLOCK
-#include "graph/block.h"
+#include "block.h"
 #endif
 #if !defined(GRAPH)
 #define GRAPH
-#include "graph/graph.h"
+#include "graph.h"
 #endif
 
 #include "cfg_creatttor.h"
@@ -21,8 +21,8 @@ typedef struct ListNode {
 
 
 FILE* cfgStream;
-struct CFG *cfg;
-struct Listnode *currNode;
+CFG *cfg;
+Listnode *currNode;
 
 
 /*
@@ -36,12 +36,12 @@ void generateCFG(FILE *cfgStreamPar)
 	
 	struct FUNCTION *currentFunc = root->FuncList;
 
-	while (currentFunc != NULL)
+	/*while (currentFunc != NULL)
 	{
 		fprintf(cfgStream, "%s\n", currentFunc->ID);
 		gotoFunction(currentFunc);
 		currentFunc = currentFunc->prev;
-	}
+	}*/
 }
 
 void gotoDeclaration(struct DECLARATION* decl)
@@ -86,16 +86,17 @@ void gotoCompound(struct COMPOUNDSTMT *comp)
 
 	struct STMT *currStmt = comp->StmtList;	
 
-	struct Block* currBlock = createBlock();
+	Block currBlock = createBlock();
+	Block* currBlockP = &currBlock;
 
 	while (currStmt != NULL)
 	{
-		currBlock = gotoStatement(currStmt, 0, currBlock);
+		currBlockP = gotoStatement(currStmt, 0, currBlockP);
 		currStmt = currStmt->prev;
 	}
 }
 
-Block* gotoStatement(struct STMT *stmt, int isAlreadyDeeper, currBlock)
+Block* gotoStatement(struct STMT *stmt, int isAlreadyDeeper, Block* currBlock)
 {
 
 	Block* returnBlock = currBlock;	
@@ -116,13 +117,13 @@ Block* gotoStatement(struct STMT *stmt, int isAlreadyDeeper, currBlock)
 			gotoExpr(stmt->stmt.return_s);
 			break;
 		case eWhile:
-			gotoWhile(stmt->stmt.while_s);
+			gotoWhile(stmt->stmt.while_s, currBlock);
 			break;
 		case eDoWhile:
-			gotoDoWhile(stmt->stmt.dowhile_s);
+			gotoDoWhile(stmt->stmt.dowhile_s, currBlock);
 			break;
 		case eFor:
-			gotoFor(stmt->stmt.for_s);
+			gotoFor(stmt->stmt.for_s, currBlock);
 			break;
 		case eIf:
 			// add Expr of the if to the current block....no idea how to do
@@ -212,41 +213,41 @@ void gotoCall(struct CALL *call)
 	}
 }
 
-void gotoWhile(struct WHILEs *whil)
+void gotoWhile(struct WHILEs *whil, Block* currBlock)
 {
 	gotoExpr(whil->condition);
-	gotoStatement(whil->stmt, 1);
+	gotoStatement(whil->stmt, 1, currBlock);
 }
 
-void gotoDoWhile(struct DOWHILEs *dowhile)
+void gotoDoWhile(struct DOWHILEs *dowhile, Block* currBlock)
 {
-	gotoStatement(dowhile->stmt, 1);
+	gotoStatement(dowhile->stmt, 1, currBlock);
 	gotoExpr(dowhile->condition);
 }
 
-void gotoFor(struct FORs *fr)
+void gotoFor(struct FORs *fr, Block* currBlock)
 {
 	gotoAssign(fr->init);
 	gotoExpr(fr->condition);
 	gotoAssign(fr->next);
-	gotoStatement(fr->stmt, 1);
+	gotoStatement(fr->stmt, 1, currBlock);
 }
 
 void gotoIf(struct IFs *iff, Block* currentBlock)
 {
 	gotoExpr(iff->condition);
 
-	Block* ifBlock = createBlock();
-	addConnection(cfg, currentBlock->nr, ifBlock->nr);
+	Block ifBlock = createBlock();
+	addConnection(cfg, currentBlock->nr, (&ifBlock)->nr);
 
-	gotoStatement(iff->if_s, 1, ifBlock);
+	gotoStatement(iff->if_s, 1, &ifBlock);
 
 	if (iff->else_s != NULL)
 	{
-		Block* elseBlock = createBlock();
-		addConnection(cfg, currentBlock->nr, elseBlock->nr);
+		Block elseBlock = createBlock();
+		addConnection(cfg, currentBlock->nr, (&elseBlock)->nr);
 
-		gotoStatement(iff->else_s, 1 elseBlock);
+		gotoStatement(iff->else_s, 1, &elseBlock);
 	}
 }
 
