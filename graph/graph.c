@@ -14,14 +14,14 @@ void initCFG(CFG* cfg)
 	}
 }
 
-void addBlock(CFG* cfg, struct Block* block)
+void addBlock(CFG* cfg, Block* block)
 {
 	if (cfg->currentEntries >= cfg->currentSize - 1)
 	{
 		doubleArray(cfg);
 	}
 
-	cfg->blocks[cfg.currentEntries++] = block;
+	cfg->blocks[cfg->currentEntries++] = block;
 }
 
 

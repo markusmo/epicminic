@@ -2,7 +2,7 @@
 #include "block.h"
 
 typedef struct CFG {
-	struct Block* blocks;
+	Block* blocks;
 	int** matrix;
 	int currentSize;
 	int currentEntries;
