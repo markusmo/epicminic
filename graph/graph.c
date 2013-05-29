@@ -1,3 +1,6 @@
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "graph.h"
 
 void initCFG(CFG* cfg)
@@ -21,7 +24,7 @@ void addBlock(CFG* cfg, Block* block)
 		doubleArray(cfg);
 	}
 
-	cfg->blocks[cfg->currentEntries++] = block;
+	cfg->blocks[cfg->currentEntries++] = *block;
 }
 
 
@@ -38,7 +41,7 @@ void doubleArray(CFG* cfg)
 	int i;
 	int oldRealSize = cfg->currentSize * sizeof(Block);
 
-	memcpy(newBlocks, cfg->blocks, oldRealSize);
+	memcopy(newBlocks, cfg->blocks, oldRealSize);
 
 	for (i = 0; i < newSize; i++)
 	{
@@ -46,7 +49,7 @@ void doubleArray(CFG* cfg)
 		
 		if (i < cfg->currentSize)
 		{
-			memcpy(newMatrix[i], cfg->matrix[i], oldRealSize);
+			memcopy(newMatrix[i], cfg->matrix[i], oldRealSize);
 			free(cfg->matrix[i]);
 		}
 	}

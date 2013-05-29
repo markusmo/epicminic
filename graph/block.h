@@ -1,3 +1,7 @@
+#include <stdlib.h>
+
+#include "../AST.h"
+
 typedef struct Block {
 	int nr;
 	struct DECLARATION *declarations;	

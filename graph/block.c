@@ -9,11 +9,11 @@ Block createBlock()
 	return b;
 }
 
-void addStatementToBlock(Block* block, STMT* stmt) {
+void addStatementToBlock(Block* block, struct STMT* stmt) {
 	if(block->statements == NULL) {
 		block->statements = stmt;		
 	} else {
-		block->lastStatment->prev = stmt;	
+		block->lastStatement->prev = stmt;	
 	}
 
 	block->lastStatement = stmt;
