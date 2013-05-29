@@ -19,12 +19,13 @@ CFG cfg;
 void generateCFG(FILE *cfgStreamPar)
 {
 	cfgStream = cfgStreamPar;
-	cfg = createCFG();
 
 	struct FUNCTION *currentFunc = root->FuncList;
 
 	while (currentFunc != NULL)
 	{
+		cfg = createCFG();
+
 		fprintf(cfgStream, "%s\n", currentFunc->ID);
 		gotoFunction(currentFunc);
 		currentFunc = currentFunc->prev;
@@ -52,7 +53,7 @@ void gotoFunction(struct FUNCTION *func)
 		currPar = currPar->prev;
 	}
 
-	gotoCompound(func->CStmt, NULL);
+	gotoCompound(func->CStmt);
 
 }
 
@@ -75,7 +76,7 @@ void gotoCompound(struct COMPOUNDSTMT *comp)
 
 	while (currStmt != NULL)
 	{
-		gotoStatement(currStmt, 0, block);
+		gotoStatement(currStmt, 0);
 		currStmt = currStmt->prev;
 	}
 }
