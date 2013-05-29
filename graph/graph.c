@@ -2,6 +2,7 @@
 
 void initCFG(CFG* cfg)
 {
+	int i;
 	cfg->currentSize = START_SIZE;
 	cfg->currentEntries = 0;
 	cfg->blocks = (Block*) calloc(START_SIZE, sizeof(Block));
@@ -11,11 +12,9 @@ void initCFG(CFG* cfg)
 	{
 		cfg->matrix[i] = (int*) calloc(cfg->currentSize, sizeof(Block));
 	}
-
-	return &cfg;
 }
 
-void addBlock(CFG* cfg, Block* block)
+void addBlock(CFG* cfg, struct Block* block)
 {
 	if (cfg->currentEntries >= cfg->currentSize - 1)
 	{

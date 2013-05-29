@@ -1,8 +1,8 @@
 CC = gcc
 BI = bison -d -r all --verbose
 FL = flex
-OBJ = main.o epic_bison.tab.o lex.yy.o printer.o symbolTable.o graph/cfg_creatttor.o
-HEADERS = epic_bison.tab.h printer.h symbolTable.h graph/cfg_creatttor.h graph/graph.h graph/block.h
+OBJ = main.o epic_bison.tab.o lex.yy.o printer.o symbolTable.o graph/graph.o graph/block.o cfg_creatttor.o
+HEADERS = epic_bison.tab.h printer.h symbolTable.h cfg_creatttor.h graph/graph.h graph/block.h
 
 all: epic_bison.tab.h epic_parser clean
 

@@ -1,7 +1,8 @@
 #define START_SIZE 64
+#include "block.h"
 
 typedef struct CFG {
-	Block* blocks;
+	struct Block* blocks;
 	int** matrix;
 	int currentSize;
 	int currentEntries;
