@@ -3,14 +3,13 @@
 #include <string.h>
 #include "block.h"
 #include "graph.h"
-#include "../AST.h"
 
 #include "cfg_creatttor.h"
 
 extern struct PROGRAM *root;
 
 FILE* cfgStream;
-CFG cfg;
+struct CFG cfg;
 
 /*
 	Generates the AST text representation and the symbol table
@@ -24,7 +23,7 @@ void generateCFG(FILE *cfgStreamPar)
 
 	while (currentFunc != NULL)
 	{
-		cfg = createCFG();
+		initCFG(&cfg);
 
 		fprintf(cfgStream, "%s\n", currentFunc->ID);
 		gotoFunction(currentFunc);

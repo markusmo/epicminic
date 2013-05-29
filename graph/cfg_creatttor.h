@@ -1,6 +1,6 @@
 #if !defined(AST)
 #define AST
-#include "AST.h"
+#include "../AST.h"
 #endif
 
 void generateCFG(FILE *astStreamPar);
