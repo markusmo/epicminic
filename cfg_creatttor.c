@@ -1,8 +1,14 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
+#if !defined(BLOCK)
+#define BLOCK
 #include "graph/block.h"
+#endif
+#if !defined(GRAPH)
+#define GRAPH
 #include "graph/graph.h"
+#endif
 
 #include "cfg_creatttor.h"
 

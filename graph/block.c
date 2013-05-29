@@ -1,4 +1,7 @@
+#if !defined(BLOCK)
+#define BLOCK
 #include "block.h"
+#endif
 
 static blockCounter = 0;
 

@@ -1,5 +1,8 @@
 #define START_SIZE 64
+#if !defined(BLOCK)
+#define BLOCK
 #include "block.h"
+#endif
 
 typedef struct CFG {
 	Block* blocks;

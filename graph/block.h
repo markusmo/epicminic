@@ -1,6 +1,9 @@
 #include <stdlib.h>
 
+#if !defined(AST)
+#define AST
 #include "../AST.h"
+#endif
 
 typedef struct Block {
 	int nr;
