@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
 		{
 			printf("'%s' successfully parsed. Tree in 'tree.txt', symboltable in 'table.txt'\n",argv[1]);
 			generateOutput(astFile, tableFile);
-			generateCFGs(cfaFile, lifenessFile);
+			generateCFG(cfaFile); //, lifenessFile);
 		}
 		/*
 		when error occured, print

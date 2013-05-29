@@ -1,20 +1,16 @@
-/*
-	This file contains functions for gotoing out the AST
-	in addition the symbol table is created during parsing
-
-	For the purpose of parsing, recursive functions are declared for each struct type
-	If structs are nested, the the functions call the specific function for the next struct
-*/
-
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
+#include "block.h"
+#include "graph.h"
+#include "../AST.h"
 
 #include "cfg_creatttor.h"
 
 extern struct PROGRAM *root;
 
 FILE* cfgStream;
+CFG cfg;
 
 /*
 	Generates the AST text representation and the symbol table
@@ -23,6 +19,7 @@ FILE* cfgStream;
 void generateCFG(FILE *cfgStreamPar)
 {
 	cfgStream = cfgStreamPar;
+	cfg = createCFG();
 
 	struct FUNCTION *currentFunc = root->FuncList;
 
@@ -55,7 +52,7 @@ void gotoFunction(struct FUNCTION *func)
 		currPar = currPar->prev;
 	}
 
-	gotoCompound(func->CStmt);
+	gotoCompound(func->CStmt, NULL);
 
 }
 
@@ -65,20 +62,20 @@ void gotoParameter(struct PARAMETER *par)
 }
 
 void gotoCompound(struct COMPOUNDSTMT *comp)
-{
+{	
 	struct DECLARATION *currDecl = comp->DeclList;
 
-	while (currDecl != NULL)
+	/*while (currDecl != NULL)
 	{
 		gotoDeclaration(currDecl);
 		currDecl = currDecl->prev;
-	}
+	}*/
 
 	struct STMT *currStmt = comp->StmtList;
 
 	while (currStmt != NULL)
 	{
-		gotoStatement(currStmt, 0);
+		gotoStatement(currStmt, 0, block);
 		currStmt = currStmt->prev;
 	}
 }
