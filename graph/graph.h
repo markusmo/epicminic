@@ -15,4 +15,5 @@ void initCFG(CFG* cfg);
 void addBlock(CFG* cfg, Block* block);
 void addConnection(CFG* cfg, int start, int end);
 void doubleArray(CFG* cfg);
+int isLeaf(CFG* cfg, Block* block);
 void printGraph(CFG* cfg);
