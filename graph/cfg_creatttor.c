@@ -32,6 +32,7 @@ Listnode *currNode;
 void generateCFG(FILE *cfgStreamPar)
 {
 	cfgStream = cfgStreamPar;
+	cfg = (CFG*) malloc(sizeof(CFG));
 	initCFG(cfg);
 	
 	struct FUNCTION *currentFunc = root->FuncList;
