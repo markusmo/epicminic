@@ -63,6 +63,18 @@ void doubleArray(CFG* cfg)
 	cfg->blocks = newBlocks;
 }
 
+int isLeaf(CFG* cfg, Block* block)
+{
+	int i;
+	for (i = 0; i < cfg->currentEntries; i++)
+	{
+		if (cfg->matrix[block->nr][i] != 0)
+			return 0;
+	}
+
+	return 1;
+}
+
 void printGraph(CFG* cfg)
 {
 	int i;
