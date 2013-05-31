@@ -37,12 +37,19 @@ void generateCFG(FILE *cfgStreamPar)
 	
 	struct FUNCTION *currentFunc = root->FuncList;
 
-	/*while (currentFunc != NULL)
+	while (currentFunc != NULL)
 	{
 		fprintf(cfgStream, "%s\n", currentFunc->ID);
 		gotoFunction(currentFunc);
 		currentFunc = currentFunc->prev;
-	}*/
+		
+	}
+
+	printGraph(cfg);
+
+	free(cfg->matrix);
+	free(cfg->blocks);
+	free(cfg);
 }
 
 void gotoDeclaration(struct DECLARATION* decl)
@@ -89,6 +96,9 @@ void gotoCompound(struct COMPOUNDSTMT *comp)
 
 	Block currBlock = createBlock();
 	Block* currBlockP = &currBlock;
+	addBlock(cfg, currBlockP);
+
+	currBlockP->declarations = currDecl;
 
 	while (currStmt != NULL)
 	{
@@ -100,7 +110,8 @@ void gotoCompound(struct COMPOUNDSTMT *comp)
 Block* gotoStatement(struct STMT *stmt, int isAlreadyDeeper, Block* currBlock)
 {
 
-	Block* returnBlock = currBlock;	
+	Block* returnBlock = (Block*) malloc(sizeof(Block));
+	returnBlock = currBlock;	
 
 	/* statement needs to be switched, because multiple possibilities are available */
 	switch (stmt->e_stmt)

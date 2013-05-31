@@ -7,7 +7,7 @@ HEADERS = epic_bison.tab.h printer.h symbolTable.h graph/cfg_creatttor.h graph/g
 all: epic_bison.tab.h epic_parser clean
 
 epic_parser: $(OBJ)
-	$(CC) -o $@ $(OBJ) -lfl
+	$(CC) -o $@ $(OBJ) -g -lfl
 
 epic_bison.tab.c: epic_bison.y
 	$(BI) epic_bison.y
