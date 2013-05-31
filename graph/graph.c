@@ -75,24 +75,23 @@ int isLeaf(CFG* cfg, Block* block)
 	return 1;
 }
 
-void printGraph(CFG* cfg)
+void printGraph(CFG* cfg, FILE* cfgStream)
 {
+	setStream(cfgStream);
+
 	int i;
 	for (i = 0; i < cfg->currentSize; i++)
 	{
-		printf("B%d\n{\n", i);
+		fprintf(cfgStream, "B%d\n{\n", i);
 		if(cfg->blocks[i].declarations != NULL) 
-		{ 
-			//}
-			printDeclaration(cfg->blocks[i].declarations); 
+		{ 	
+			printCFGDeclaration(cfg->blocks[i].declarations); 
 		}
 		if(cfg->blocks[i].statements != NULL) 
-		{ 
-			printf("%d\n", cfg->blocks[i].statements->e_stmt); //}
-			
-			//printStatement(cfg->blocks[i].statements); 
+		{ 	
+			printCFGStatement(cfg->blocks[i].statements);
 		}
-		printf("}\n");
+		fprintf(cfgStream, "}\n");
 
 		//TODO all somehow in one loop??
 		printf("Predecessor: ");

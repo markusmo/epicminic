@@ -23,7 +23,7 @@ typedef struct ListNode {
 FILE* cfgStream;
 CFG *cfg;
 Listnode *currNode;
-
+int firstBlock = 0;
 
 /*
 	Generates the AST text representation and the symbol table
@@ -39,17 +39,12 @@ void generateCFG(FILE *cfgStreamPar)
 
 	while (currentFunc != NULL)
 	{
-		fprintf(cfgStream, "%s\n", currentFunc->ID);
+		fprintf(cfgStream, "%s\n\n", currentFunc->ID);
 		gotoFunction(currentFunc);
 		currentFunc = currentFunc->prev;
-		
 	}
 
-	printGraph(cfg);
-
-	//free(cfg->matrix);
-	//free(cfg->blocks);
-	//free(cfg);
+	printGraph(cfg, cfgStream);
 }
 
 void gotoDeclaration(struct DECLARATION* decl)
@@ -73,7 +68,7 @@ void gotoFunction(struct FUNCTION *func)
 		currPar = currPar->prev;
 	}
 
-	gotoCompound(func->CStmt);
+	gotoCompound(func->CStmt, 1, NULL);
 
 }
 
@@ -82,23 +77,25 @@ void gotoParameter(struct PARAMETER *par)
 	gotoIdentifier(par->id);	
 }
 
-void gotoCompound(struct COMPOUNDSTMT *comp)
+void gotoCompound(struct COMPOUNDSTMT *comp, int functionComp, Block* currBlockP)
 {	
 	struct DECLARATION *currDecl = comp->DeclList;
 
-	/*while (currDecl != NULL)
+	if(functionComp) {
+		Block currBlock = createBlock();
+		currBlockP = &currBlock;
+		addBlock(cfg, currBlockP);
+	}
+
+	currBlockP->declarations = currDecl;
+
+	while (currDecl != NULL)
 	{
 		gotoDeclaration(currDecl);
 		currDecl = currDecl->prev;
-	}*/
+	}
 
 	struct STMT *currStmt = comp->StmtList;	
-
-	Block currBlock = createBlock();
-	Block* currBlockP = &currBlock;
-	addBlock(cfg, currBlockP);
-
-	currBlockP->declarations = currDecl;
 
 	while (currStmt != NULL)
 	{
@@ -142,7 +139,7 @@ Block* gotoStatement(struct STMT *stmt, int isAlreadyDeeper, Block* currBlock)
 			gotoIf(stmt->stmt.if_s, currBlock);
 			break;
 		case eCompound:
-			gotoCompound(stmt->stmt.compound_s);
+			gotoCompound(stmt->stmt.compound_s, 0, currBlock);
 			break;
 		case eSemi:
 			break;
@@ -166,10 +163,10 @@ void gotoExpr(struct EXPR *expr)
 			gotoCall(expr->expression.call_expr);
 			break;
 		case eIntnum:
-			//gotoInt(expr->expression.intnum);
+			gotoInt(expr->expression.intnum);
 			break;
 		case eFloatnum:
-			//gotoFloat(expr->expression.floatnum);
+			gotoFloat(expr->expression.floatnum);
 			break;
 		case eId:
 			gotoIDs(expr->expression.ID_expr);
@@ -232,7 +229,7 @@ void gotoWhile(struct WHILEs *whil, Block* currBlock)
 }
 
 void gotoDoWhile(struct DOWHILEs *dowhile, Block* currBlock)
-{
+{	
 	gotoStatement(dowhile->stmt, 1, currBlock);
 	gotoExpr(dowhile->condition);
 }
@@ -247,8 +244,8 @@ void gotoFor(struct FORs *fr, Block* currBlock)
 
 void gotoIf(struct IFs *iff, Block* currentBlock)
 {
-	gotoExpr(iff->condition);
 
+	gotoExpr(iff->condition);
 	Block ifBlock = createBlock();
 	addConnection(cfg, currentBlock->nr, (&ifBlock)->nr);
 
@@ -265,6 +262,23 @@ void gotoIf(struct IFs *iff, Block* currentBlock)
 
 void gotoIdentifier(struct IDENTIFIER* identifier)
 {	
+	if (identifier->intnum == 0) {
+		//fprintf(cfgStream, "%s", identifier->ID);
+	}
+	else {
+		//fprintf(cfgStream, "%s[%d]", identifier->ID, identifier->intnum);
+	}
 }
+
+void gotoInt(int i)
+{
+	//fprintf(cfgStream, "%d", i);
+}
+
+void gotoFloat(float f)
+{
+	//fprintf(cfgStream, "%f", f);
+}
+
 
 
