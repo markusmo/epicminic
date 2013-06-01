@@ -26,6 +26,7 @@ void addBlock(CFG* cfg, Block* block)
 	}
 
 	cfg->blocks[cfg->currentEntries++] = *block;
+
 }
 
 
@@ -94,23 +95,23 @@ void printGraph(CFG* cfg, FILE* cfgStream)
 		fprintf(cfgStream, "}\n");
 
 		//TODO all somehow in one loop??
-		printf("Predecessor: ");
+		//printf("Predecessor: ");
 		int j;
 		for (j = 0; j < cfg->currentSize; j++)
 		{
 			if (cfg->matrix[j][cfg->blocks[i].nr] == 1)
 			{
-				printf("B%d, ", j);
+				//printf("B%d, ", j);
 			}
 		}
-		printf("\nSuccessor: ");
+		//printf("\nSuccessor: ");
 		for (j = 0; j < cfg->currentSize; j++)
 		{
 			if (cfg->matrix[cfg->blocks[i].nr][j] == 1)
 			{
-				printf("B%d, ", j);
+				//printf("B%d, ", j);
 			}
 		}
-		printf("\n\n");
+		//printf("\n\n");
 	}
 }

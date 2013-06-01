@@ -88,6 +88,8 @@ void gotoCompound(struct COMPOUNDSTMT *comp, int functionComp, Block* currBlockP
 	}
 
 	currBlockP->declarations = currDecl;
+	printf("%s\n", currBlockP->declarations->ilist->ID);
+	printf("%p\n", cfg->blocks[0].declarations);
 
 	while (currDecl != NULL)
 	{
@@ -107,8 +109,7 @@ void gotoCompound(struct COMPOUNDSTMT *comp, int functionComp, Block* currBlockP
 Block* gotoStatement(struct STMT *stmt, int isAlreadyDeeper, Block* currBlock)
 {
 
-	Block* returnBlock = (Block*) malloc(sizeof(Block));
-	returnBlock = currBlock;	
+	Block* returnBlock = currBlock;	
 
 	/* statement needs to be switched, because multiple possibilities are available */
 	switch (stmt->e_stmt)
@@ -263,7 +264,7 @@ void gotoIf(struct IFs *iff, Block* currentBlock)
 void gotoIdentifier(struct IDENTIFIER* identifier)
 {	
 	if (identifier->intnum == 0) {
-		//fprintf(cfgStream, "%s", identifier->ID);
+		//printf("Identifier id: %s\n", identifier->ID);
 	}
 	else {
 		//fprintf(cfgStream, "%s[%d]", identifier->ID, identifier->intnum);
