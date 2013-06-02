@@ -83,13 +83,10 @@ void gotoCompound(struct COMPOUNDSTMT *comp, int functionComp, Block* currBlockP
 
 	if(functionComp) {
 		Block currBlock = createBlock();
-		currBlockP = &currBlock;
-		addBlock(cfg, currBlockP);
+		currBlockP = addBlock(cfg, &currBlock);
 	}
 
 	currBlockP->declarations = currDecl;
-	printf("%s\n", currBlockP->declarations->ilist->ID);
-	printf("%p\n", cfg->blocks[0].declarations);
 
 	while (currDecl != NULL)
 	{
@@ -108,17 +105,18 @@ void gotoCompound(struct COMPOUNDSTMT *comp, int functionComp, Block* currBlockP
 
 Block* gotoStatement(struct STMT *stmt, int isAlreadyDeeper, Block* currBlock)
 {
-
 	Block* returnBlock = currBlock;	
 
 	/* statement needs to be switched, because multiple possibilities are available */
 	switch (stmt->e_stmt)
 	{
 		case eAssign:
+			printf("Assigns\n");
 			addStatementToBlock(currBlock, stmt);
 			gotoAssign(stmt->stmt.assign_s);
 			break;
 		case eCall:
+			printf("Calls\n");
 			addStatementToBlock(currBlock, stmt);
 			gotoCall(stmt->stmt.call_s);
 			break;
@@ -137,7 +135,7 @@ Block* gotoStatement(struct STMT *stmt, int isAlreadyDeeper, Block* currBlock)
 			break;
 		case eIf:
 			// add Expr of the if to the current block....no idea how to do
-			gotoIf(stmt->stmt.if_s, currBlock);
+			returnBlock = gotoIf(stmt->stmt.if_s, currBlock);
 			break;
 		case eCompound:
 			gotoCompound(stmt->stmt.compound_s, 0, currBlock);
@@ -243,22 +241,27 @@ void gotoFor(struct FORs *fr, Block* currBlock)
 	gotoStatement(fr->stmt, 1, currBlock);
 }
 
-void gotoIf(struct IFs *iff, Block* currentBlock)
+Block* gotoIf(struct IFs *iff, Block* currentBlock)
 {
 
 	gotoExpr(iff->condition);
 	Block ifBlock = createBlock();
-	addConnection(cfg, currentBlock->nr, (&ifBlock)->nr);
+	Block* ifBlockP = addBlock(cfg, &ifBlock);
+	addConnection(cfg, currentBlock->nr, ifBlockP->nr);
 
-	gotoStatement(iff->if_s, 1, &ifBlock);
+	gotoStatement(iff->if_s, 1, ifBlockP);
 
 	if (iff->else_s != NULL)
 	{
 		Block elseBlock = createBlock();
-		addConnection(cfg, currentBlock->nr, (&elseBlock)->nr);
+		Block* elseBlockP = addBlock(cfg, &elseBlock);
+		addConnection(cfg, currentBlock->nr, elseBlockP->nr);
 
-		gotoStatement(iff->else_s, 1, &elseBlock);
+		gotoStatement(iff->else_s, 1, elseBlockP);
 	}
+
+	Block newBlock = createBlock();
+	return addBlock(cfg, &newBlock);
 }
 
 void gotoIdentifier(struct IDENTIFIER* identifier)

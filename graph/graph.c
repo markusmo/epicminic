@@ -18,7 +18,7 @@ void initCFG(CFG* cfg)
 	}
 }
 
-void addBlock(CFG* cfg, Block* block)
+Block* addBlock(CFG* cfg, Block* block)
 {
 	if (cfg->currentEntries >= cfg->currentSize - 1)
 	{
@@ -26,6 +26,7 @@ void addBlock(CFG* cfg, Block* block)
 	}
 
 	cfg->blocks[cfg->currentEntries++] = *block;
+	return &cfg->blocks[cfg->currentEntries-1];
 
 }
 
@@ -86,32 +87,44 @@ void printGraph(CFG* cfg, FILE* cfgStream)
 		fprintf(cfgStream, "B%d\n{\n", i);
 		if(cfg->blocks[i].declarations != NULL) 
 		{ 	
-			printCFGDeclaration(cfg->blocks[i].declarations); 
+			struct DECLARATION* temp = cfg->blocks[i].declarations;
+			while(temp != NULL) {
+				fprintf(cfgStream, "\t");
+				printCFGDeclaration(temp);
+				temp = temp->prev; 
+			}			
 		}
 		if(cfg->blocks[i].statements != NULL) 
 		{ 	
-			printCFGStatement(cfg->blocks[i].statements);
+			struct STMT* temp = cfg->blocks[i].statements;
+			while(temp != NULL) {
+				printf("%d -> %p\n", i, temp);
+				fprintf(cfgStream, "\t");
+				printCFGStatement(temp);
+				temp = temp->prev; 
+			}	
 		}
 		fprintf(cfgStream, "}\n");
 
 		//TODO all somehow in one loop??
-		//printf("Predecessor: ");
+		fprintf(cfgStream, "Predecessor: ");
 		int j;
 		for (j = 0; j < cfg->currentSize; j++)
 		{
 			if (cfg->matrix[j][cfg->blocks[i].nr] == 1)
 			{
-				//printf("B%d, ", j);
+				fprintf(cfgStream, "B%d, ", j);
 			}
 		}
-		//printf("\nSuccessor: ");
+
+		fprintf(cfgStream, "\nSuccessor: ");
 		for (j = 0; j < cfg->currentSize; j++)
 		{
 			if (cfg->matrix[cfg->blocks[i].nr][j] == 1)
 			{
-				//printf("B%d, ", j);
+				fprintf(cfgStream, "B%d, ", j);
 			}
 		}
-		//printf("\n\n");
+		fprintf(cfgStream, "\n\n");
 	}
 }

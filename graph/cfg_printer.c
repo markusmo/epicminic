@@ -246,13 +246,13 @@ void printCFGIf(struct IFs *iff)
 	printCFGExpr(iff->condition);
 	fprintf(cfgStream, ")\n");
 
-	printCFGStatement(iff->if_s);
+	//printCFGStatement(iff->if_s);
 
-	if (iff->else_s != NULL)
-	{
-		fprintf(cfgStream, "else\n");
-		printCFGStatement(iff->else_s);
-	}
+	//if (iff->else_s != NULL)
+	//{
+	//	fprintf(cfgStream, "else\n");
+	//	printCFGStatement(iff->else_s);
+	//}
 }
 
 void printCFGIdentifier(struct IDENTIFIER* identifier)
