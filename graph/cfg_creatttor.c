@@ -26,6 +26,7 @@ int if_deepness = 0;
 
 int firstBlock = 0;
 
+
 /*
 	Generates the AST text representation and the symbol table
 	For both files seperate streams are needed - their opening/closing should be handled from the outside
@@ -106,16 +107,7 @@ void gotoCompound(struct COMPOUNDSTMT *comp, int functionComp, Block* currBlockP
 
 Block* gotoStatement(struct STMT *stmt, int isAlreadyDeeper, Block* currBlock)
 {
-	Block* returnBlock = currBlock;	
-
-	/*Listnode* temp = startNode;
-	while(temp != NULL) {
-		if(if_deepness < temp->deepness) {
-			addConnection(cfg, temp->block->nr, currBlock->nr);
-			deleteNode(temp);
-		}
-		temp = temp->next;
-	} */
+	Block* returnBlock = currBlock;
 
 	/* statement needs to be switched, because multiple possibilities are available */
 	switch (stmt->e_stmt)
@@ -146,6 +138,7 @@ Block* gotoStatement(struct STMT *stmt, int isAlreadyDeeper, Block* currBlock)
 			if_deepness++;
 			addStatementToBlock(currBlock, stmt);
 			returnBlock = gotoIf(stmt->stmt.if_s, currBlock);
+
 			if_deepness--;
 			break;
 		case eCompound:
@@ -254,9 +247,11 @@ void gotoFor(struct FORs *fr, Block* currBlock)
 
 Block* gotoIf(struct IFs *iff, Block* currentBlock)
 {
+	int elseNr = -1;
 
 	gotoExpr(iff->condition);
 	Block ifBlock = createBlock();
+	
 	Block* ifBlockP = addBlock(cfg, &ifBlock);
 	addConnection(cfg, currentBlock->nr, ifBlockP->nr);
 	
@@ -266,6 +261,7 @@ Block* gotoIf(struct IFs *iff, Block* currentBlock)
 	if (iff->else_s != NULL)
 	{
 		Block elseBlock = createBlock();
+		elseNr = elseBlock.nr;
 		Block* elseBlockP = addBlock(cfg, &elseBlock);
 		addConnection(cfg, currentBlock->nr, elseBlockP->nr);
 
@@ -277,6 +273,13 @@ Block* gotoIf(struct IFs *iff, Block* currentBlock)
 	}
 
 	Block newBlock = createBlock();
+	addConnection(cfg, ifBlock.nr, newBlock.nr);
+
+	if (elseNr >= 0)
+	{
+		addConnection(cfg, elseNr, newBlock.nr);
+	}
+
 	return addBlock(cfg, &newBlock);
 }
 

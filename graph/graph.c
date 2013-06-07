@@ -27,7 +27,6 @@ Block* addBlock(CFG* cfg, Block* block)
 
 	cfg->blocks[cfg->currentEntries++] = *block;
 	return &cfg->blocks[cfg->currentEntries-1];
-
 }
 
 
@@ -79,7 +78,20 @@ int isLeaf(CFG* cfg, Block* block)
 
 void printGraph(CFG* cfg, FILE* cfgStream)
 {
+
+	int a,b;
 	setStream(cfgStream);
+
+	for (a = 0; a < 5; a++)
+	{
+		for (b = 0; b < 5; b++)
+		{
+			fprintf(cfgStream, "%d\t", cfg->matrix[a][b]);
+		}
+		fprintf(cfgStream, "\n");
+	}
+	
+	fprintf(cfgStream, "\n\n\n");
 
 	int i;
 	for (i = 0; i < cfg->currentSize; i++)
