@@ -1,5 +1,6 @@
 # Object files
 *.o
+epic_parser
 
 # Libraries
 *.lib
