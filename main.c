@@ -20,10 +20,7 @@ int main(int argc, char *argv[])
 	if(argc < 2)
 	{
 		printf("Please enter: epic_parser *in_filename* \n");
-                argv = malloc(2);
-                argv[1] = malloc(15);
-                argv[1] = "testCFG.emc";
-		//return 0;
+		return 0;
 	}
 	/*
 	check if file exists
