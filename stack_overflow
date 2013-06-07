@@ -1,0 +1,43 @@
+Hi, I have some problems creating my intermediate representation with bison.
+I have some different structs which represent the different nodes in my syntax tree, so I organized them all together in my union declaration.
+Typee btw is an enum.
+
+%union {
+ int ivalue;
+ float fvalue;
+ Typee typee;
+ char *string;
+ struct PROGRAM *prog;
+ struct DECLARATION *decl;
+ ...
+}
+
+Now I want to stick build my syntax tree with the instructions in the bison file.
+So I connect my lists and structs together.
+Here are some elements of my bison file:
+
+ program: decList funcList  { struct PROGRAM p; p.DeclList = $1; p.FuncList = $2; root = p; }
+  | decList   { struct PROGRAM p; p.FuncList = NULL; p.DeclList = $1; root = p; }
+  | funcList  { struct PROGRAM p; p.FuncList = $1; p.DeclList = NULL; root = p; }
+  | /* empty */  { struct PROGRAM p; p.FuncList = NULL; p.DeclList = NULL; root = p; }
+  ;
+
+ 
+ decList: declaration  { $$ = $1; }
+  | decList declaration  { struct DECLARATION* d; d = $2; d->prev = $1; $$ = d; }
+  ;
+ 
+ declaration: type identList SEMICOLON { struct DECLARATION d; d.t = $1; d.ilist = $2; d.prev = NULL; $$ = &d; };
+
+ type: INT   { $$ = eInt; }
+  | FLOAT  { $$ = eFloat; }
+  ;
+
+But the problem is, that as soon as I change a value in my struct, all the values which are combined in the union at the beginning contain the newly assigned value.
+So as an example, if I parse a simple code file, which contains just an int and a float declaration, both types end up being declared as float because it is assigned later.
+In the beginning it is correctly assigned with int.
+
+The problem goes even further, so when I assign the DeclList in the program declaration, all values point to this entry. So even the type is assigned as this specific DECLARATION, the prev-pointer points to itself and so on...
+
+I guess I use the union declaration in a wrong way, because it seems, that all entries point to a single address instead of declaring one union for each variable that is needed.
+So what is the right way of doing this, without screwing up all my pointers?

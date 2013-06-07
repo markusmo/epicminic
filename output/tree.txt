@@ -12,8 +12,11 @@ z=200;
 }
 else
 {
-z=5;
+y=3;
 }
+}
+else
+{
 printf(ASDF);
 }
 y=5;

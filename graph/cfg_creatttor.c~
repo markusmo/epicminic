@@ -278,7 +278,7 @@ Block* gotoIf(struct IFs *iff, Block* currentBlock)
 	Block newBlock = createBlock();
 	
 	addConnection(cfg, nextBlock->nr, newBlock.nr);
-	printf("281 (%d): %d -> %d\n", ifBlock.nr, nextBlock->nr, newBlock.nr);
+	printf("281: %d -> %d\n", nextBlock->nr, newBlock.nr);
 
 	if (elseNr >= 0)
 	{

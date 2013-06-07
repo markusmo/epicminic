@@ -1,0 +1,30 @@
+Function name: GLOBAL
+count		Type		Name		Array		Role
+1		int		gEpic		 		var
+2		float		fFloat		 		var
+3		float		fFloat2		 		var
+
+Function name: GLOBAL - fun
+count		Type		Name		Array		Role
+1		float		a		 		param
+2		float		b		 		param
+3		float		c		 		param
+4		int		temp		 		var
+5		int		i		 		var
+6		float		arr		10		var
+
+Function name: GLOBAL - fun - for
+count		Type		Name		Array		Role
+1		float		temp2		 		var
+
+Function name: GLOBAL - fun - for - compound
+count		Type		Name		Array		Role
+1		int		inComp		 		var
+2		int		iComp2		 		var
+3		int		iComp3		 		var
+
+Function name: GLOBAL - func
+count		Type		Name		Array		Role
+1		int		a		 		param
+2		int		b		 		param
+

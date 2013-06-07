@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="88">
+  <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
+    <df root="." name="epicminic">
+      <df name="graph">
+        <in>block.c</in>
+        <in>block.h</in>
+        <in>cfg_creatttor.c</in>
+        <in>cfg_creatttor.h</in>
+        <in>cfg_printer.c</in>
+        <in>cfg_printer.h</in>
+        <in>graph.c</in>
+        <in>graph.h</in>
+        <in>list.c</in>
+        <in>list.h</in>
+      </df>
+      <in>AST.h</in>
+      <in>epic_bison.tab.c</in>
+      <in>lex.yy.c</in>
+      <in>main.c</in>
+      <in>printer.c</in>
+      <in>printer.h</in>
+      <in>symbolTable.c</in>
+      <in>symbolTable.h</in>
+    </df>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>makefile</itemPath>
+    </logicalFolder>
+  </logicalFolder>
+  <sourceFolderFilter>^(nbproject)$</sourceFolderFilter>
+  <sourceRootList>
+    <Elem>.</Elem>
+  </sourceRootList>
+  <projectmakefile>makefile</projectmakefile>
+  <confs>
+    <conf name="Default" type="0">
+      <toolsSet>
+        <remote-sources-mode>LOCAL_SOURCES</remote-sources-mode>
+        <compilerSet>default</compilerSet>
+      </toolsSet>
+      <codeAssistance>
+      </codeAssistance>
+      <makefileType>
+        <makeTool>
+          <buildCommandWorkingDir>.</buildCommandWorkingDir>
+          <buildCommand>${MAKE} -f makefile</buildCommand>
+          <cleanCommand>${MAKE} -f makefile clean</cleanCommand>
+          <executablePath>epic_parser</executablePath>
+        </makeTool>
+      </makefileType>
+      <item path="AST.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="epic_bison.tab.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <folder path="epicminic/graph">
+        <cTool>
+          <incDir>
+            <pElem>.</pElem>
+          </incDir>
+        </cTool>
+      </folder>
+      <item path="graph/block.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="graph/block.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="graph/cfg_creatttor.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="graph/cfg_creatttor.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="graph/cfg_printer.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="graph/cfg_printer.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="graph/graph.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="graph/graph.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="graph/list.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="graph/list.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="lex.yy.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="main.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="printer.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="printer.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="symbolTable.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="symbolTable.h" ex="false" tool="3" flavor2="0">
+      </item>
+    </conf>
+  </confs>
+</configurationDescriptor>

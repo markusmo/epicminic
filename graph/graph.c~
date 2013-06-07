@@ -33,7 +33,6 @@ Block* addBlock(CFG* cfg, Block* block)
 void addConnection(CFG* cfg, int start, int end)
 {
 	cfg->matrix[start][end] = 1;
-	printf("%d -> %d\n", start, end);
 }
 
 void doubleArray(CFG* cfg)
