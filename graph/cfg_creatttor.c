@@ -9,20 +9,21 @@
 #define GRAPH
 #include "graph.h"
 #endif
-
+#if !defined(LIST)
+#define LIST
+#include "list.h"
+#endif
 #include "cfg_creatttor.h"
 
 extern struct PROGRAM *root;
-
-typedef struct ListNode {
-	struct ListNode* next;
-	struct Block* block;
-} Listnode;
-
+extern Listnode *startNode;
+extern Listnode *lastNode;
 
 FILE* cfgStream;
 CFG *cfg;
-Listnode *currNode;
+
+int if_deepness = 0;
+
 int firstBlock = 0;
 
 /*
@@ -30,7 +31,7 @@ int firstBlock = 0;
 	For both files seperate streams are needed - their opening/closing should be handled from the outside
 */
 void generateCFG(FILE *cfgStreamPar)
-{
+{	
 	cfgStream = cfgStreamPar;
 	cfg = (CFG*) malloc(sizeof(CFG));
 	initCFG(cfg);
@@ -107,16 +108,23 @@ Block* gotoStatement(struct STMT *stmt, int isAlreadyDeeper, Block* currBlock)
 {
 	Block* returnBlock = currBlock;	
 
+	/*Listnode* temp = startNode;
+	while(temp != NULL) {
+		if(if_deepness < temp->deepness) {
+			addConnection(cfg, temp->block->nr, currBlock->nr);
+			deleteNode(temp);
+		}
+		temp = temp->next;
+	} */
+
 	/* statement needs to be switched, because multiple possibilities are available */
 	switch (stmt->e_stmt)
 	{
 		case eAssign:
-			printf("Assigns\n");
 			addStatementToBlock(currBlock, stmt);
 			gotoAssign(stmt->stmt.assign_s);
 			break;
 		case eCall:
-			printf("Calls\n");
 			addStatementToBlock(currBlock, stmt);
 			gotoCall(stmt->stmt.call_s);
 			break;
@@ -135,7 +143,10 @@ Block* gotoStatement(struct STMT *stmt, int isAlreadyDeeper, Block* currBlock)
 			break;
 		case eIf:
 			// add Expr of the if to the current block....no idea how to do
+			if_deepness++;
+			addStatementToBlock(currBlock, stmt);
 			returnBlock = gotoIf(stmt->stmt.if_s, currBlock);
+			if_deepness--;
 			break;
 		case eCompound:
 			gotoCompound(stmt->stmt.compound_s, 0, currBlock);
@@ -248,7 +259,8 @@ Block* gotoIf(struct IFs *iff, Block* currentBlock)
 	Block ifBlock = createBlock();
 	Block* ifBlockP = addBlock(cfg, &ifBlock);
 	addConnection(cfg, currentBlock->nr, ifBlockP->nr);
-
+	
+	addBlockToList(ifBlockP, if_deepness);
 	gotoStatement(iff->if_s, 1, ifBlockP);
 
 	if (iff->else_s != NULL)
@@ -257,7 +269,11 @@ Block* gotoIf(struct IFs *iff, Block* currentBlock)
 		Block* elseBlockP = addBlock(cfg, &elseBlock);
 		addConnection(cfg, currentBlock->nr, elseBlockP->nr);
 
+		addBlockToList(elseBlockP, if_deepness);
 		gotoStatement(iff->else_s, 1, elseBlockP);
+
+	} else {
+		addBlockToList(currentBlock, if_deepness);
 	}
 
 	Block newBlock = createBlock();
@@ -283,6 +299,4 @@ void gotoFloat(float f)
 {
 	//fprintf(cfgStream, "%f", f);
 }
-
-
 

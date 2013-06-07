@@ -6,11 +6,14 @@ int fun(int x, int y) {
 	x = z * y;
 
 	if(x < 100) {
-		z = 5;	
-	} else {
-		z = 10;	
+		if(x < 50) {
+			z = 200;		
+		} else {
+			z = 5;		
+		}
+
+		printf("ASDF");
 	}
 
 	y = 5;
-	printf("asdf");
 }

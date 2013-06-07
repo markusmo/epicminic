@@ -12,6 +12,7 @@ Block createBlock()
 	b.declarations = NULL;
 	b.lastStatement = NULL;
 	b.nr = blockCounter++;
+	b.countStmts = 0;
 	return b;
 }
 
@@ -24,4 +25,5 @@ void addStatementToBlock(Block* block, struct STMT* stmt) {
 	}
 
 	block->lastStatement = stmt;
+	block->countStmts++;
 }

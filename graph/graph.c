@@ -84,47 +84,50 @@ void printGraph(CFG* cfg, FILE* cfgStream)
 	int i;
 	for (i = 0; i < cfg->currentSize; i++)
 	{
-		fprintf(cfgStream, "B%d\n{\n", i);
-		if(cfg->blocks[i].declarations != NULL) 
-		{ 	
-			struct DECLARATION* temp = cfg->blocks[i].declarations;
-			while(temp != NULL) {
-				fprintf(cfgStream, "\t");
-				printCFGDeclaration(temp);
-				temp = temp->prev; 
-			}			
-		}
-		if(cfg->blocks[i].statements != NULL) 
-		{ 	
-			struct STMT* temp = cfg->blocks[i].statements;
-			while(temp != NULL) {
-				printf("%d -> %p\n", i, temp);
-				fprintf(cfgStream, "\t");
-				printCFGStatement(temp);
-				temp = temp->prev; 
-			}	
-		}
-		fprintf(cfgStream, "}\n");
-
-		//TODO all somehow in one loop??
-		fprintf(cfgStream, "Predecessor: ");
-		int j;
-		for (j = 0; j < cfg->currentSize; j++)
-		{
-			if (cfg->matrix[j][cfg->blocks[i].nr] == 1)
-			{
-				fprintf(cfgStream, "B%d, ", j);
+		if(cfg->blocks[i].declarations != NULL || cfg->blocks[i].statements != NULL) {
+			fprintf(cfgStream, "B%d\n{\n", i);
+			if(cfg->blocks[i].declarations != NULL) 
+			{ 	
+				struct DECLARATION* temp = cfg->blocks[i].declarations;
+				while(temp != NULL) {
+					fprintf(cfgStream, "\t");
+					printCFGDeclaration(temp);
+					temp = temp->prev; 
+				}			
 			}
-		}
-
-		fprintf(cfgStream, "\nSuccessor: ");
-		for (j = 0; j < cfg->currentSize; j++)
-		{
-			if (cfg->matrix[cfg->blocks[i].nr][j] == 1)
-			{
-				fprintf(cfgStream, "B%d, ", j);
+			if(cfg->blocks[i].statements != NULL) 
+			{ 	
+				struct STMT* temp = cfg->blocks[i].statements;
+				int count = 0;
+				while(temp != NULL && count < cfg->blocks[i].countStmts) {
+					fprintf(cfgStream, "\t");
+					printCFGStatement(temp);
+					temp = temp->prev; 
+					count++;
+				}	
 			}
+			fprintf(cfgStream, "}\n");
+
+			//TODO all somehow in one loop??
+			fprintf(cfgStream, "Predecessor: ");
+			int j;
+			for (j = 0; j < cfg->currentSize; j++)
+			{
+				if (cfg->matrix[j][cfg->blocks[i].nr] == 1)
+				{
+					fprintf(cfgStream, "B%d, ", j);
+				}
+			}
+
+			fprintf(cfgStream, "\nSuccessor: ");
+			for (j = 0; j < cfg->currentSize; j++)
+			{
+				if (cfg->matrix[cfg->blocks[i].nr][j] == 1)
+				{
+					fprintf(cfgStream, "B%d, ", j);
+				}
+			}
+			fprintf(cfgStream, "\n\n");
 		}
-		fprintf(cfgStream, "\n\n");
 	}
 }

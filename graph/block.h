@@ -10,6 +10,7 @@ typedef struct Block {
 	struct DECLARATION *declarations;	
 	struct STMT *statements;
 	struct STMT *lastStatement;
+	int countStmts;
 } Block;
 
 Block createBlock();
