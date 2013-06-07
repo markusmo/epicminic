@@ -253,7 +253,8 @@ void printAssign(struct ASSIGN *assign)
 		printExpr(assign->index);
 		fprintf(astStream, "]");
 	}
-	fprintf(astStream, "=");
+
+	fprintf(astStream, "=");	
 	printExpr(assign->expr);
 }
 

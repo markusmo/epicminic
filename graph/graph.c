@@ -18,7 +18,7 @@ void initCFG(CFG* cfg)
 	}
 }
 
-void addBlock(CFG* cfg, Block* block)
+Block* addBlock(CFG* cfg, Block* block)
 {
 	if (cfg->currentEntries >= cfg->currentSize - 1)
 	{
@@ -26,6 +26,8 @@ void addBlock(CFG* cfg, Block* block)
 	}
 
 	cfg->blocks[cfg->currentEntries++] = *block;
+	return &cfg->blocks[cfg->currentEntries-1];
+
 }
 
 
@@ -75,34 +77,57 @@ int isLeaf(CFG* cfg, Block* block)
 	return 1;
 }
 
-void printGraph(CFG* cfg)
+void printGraph(CFG* cfg, FILE* cfgStream)
 {
+	setStream(cfgStream);
+
 	int i;
 	for (i = 0; i < cfg->currentSize; i++)
 	{
-		printf("B%d\n{\n", i);
-		printDeclaration(cfg->blocks[i].declarations);
-		printStatement(cfg->blocks[i].statements);
-		printf("}\n");
+		if(cfg->blocks[i].declarations != NULL || cfg->blocks[i].statements != NULL) {
+			fprintf(cfgStream, "B%d\n{\n", i);
+			if(cfg->blocks[i].declarations != NULL) 
+			{ 	
+				struct DECLARATION* temp = cfg->blocks[i].declarations;
+				while(temp != NULL) {
+					fprintf(cfgStream, "\t");
+					printCFGDeclaration(temp);
+					temp = temp->prev; 
+				}			
+			}
+			if(cfg->blocks[i].statements != NULL) 
+			{ 	
+				struct STMT* temp = cfg->blocks[i].statements;
+				int count = 0;
+				while(temp != NULL && count < cfg->blocks[i].countStmts) {
+					fprintf(cfgStream, "\t");
+					printCFGStatement(temp);
+					temp = temp->prev; 
+					count++;
+				}	
+			}
+			fprintf(cfgStream, "}\n");
 
-		//TODO all somehow in one loop??
-		printf("Predecessor: ");
-		int j;
-		for (j = 0; j < cfg->currentSize; j++)
-		{
-			if (cfg->matrix[j][cfg->blocks[i].nr] == 1)
+			//TODO all somehow in one loop??
+			fprintf(cfgStream, "Predecessor: ");
+			int j;
+			for (j = 0; j < cfg->currentSize; j++)
 			{
-				printf("B%d, ", j);
+				if (cfg->matrix[j][cfg->blocks[i].nr] == 1)
+				{
+					fprintf(cfgStream, "B%d, ", j);
+				}
 			}
-		}
-		printf("\nSuccessor: ");
-		for (j = 0; j < cfg->currentSize; j++)
-		{
-			if (cfg->matrix[cfg->blocks[i].nr][j] == 1)
+
+			fprintf(cfgStream, "\nSuccessor: ");
+			for (j = 0; j < cfg->currentSize; j++)
 			{
-				printf("B%d, ", j);
+				if (cfg->matrix[cfg->blocks[i].nr][j] == 1)
+				{
+					fprintf(cfgStream, "B%d, ", j);
+				}
 			}
+			fprintf(cfgStream, "\n\n");
 		}
-		printf("\n\n");
 	}
 }

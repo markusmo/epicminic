@@ -12,8 +12,8 @@ typedef struct CFG {
 } CFG;
 
 void initCFG(CFG* cfg);
-void addBlock(CFG* cfg, Block* block);
+Block* addBlock(CFG* cfg, Block* block);
 void addConnection(CFG* cfg, int start, int end);
 void doubleArray(CFG* cfg);
 int isLeaf(CFG* cfg, Block* block);
-void printGraph(CFG* cfg);
+void printGraph(CFG* cfg, FILE* cfgStream);

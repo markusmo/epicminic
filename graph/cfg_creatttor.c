@@ -9,40 +9,43 @@
 #define GRAPH
 #include "graph.h"
 #endif
-
+#if !defined(LIST)
+#define LIST
+#include "list.h"
+#endif
 #include "cfg_creatttor.h"
 
 extern struct PROGRAM *root;
-
-typedef struct ListNode {
-	struct ListNode* next;
-	struct Block* block;
-} Listnode;
-
+extern Listnode *startNode;
+extern Listnode *lastNode;
 
 FILE* cfgStream;
 CFG *cfg;
-Listnode *currNode;
 
+int if_deepness = 0;
+
+int firstBlock = 0;
 
 /*
 	Generates the AST text representation and the symbol table
 	For both files seperate streams are needed - their opening/closing should be handled from the outside
 */
 void generateCFG(FILE *cfgStreamPar)
-{
+{	
 	cfgStream = cfgStreamPar;
 	cfg = (CFG*) malloc(sizeof(CFG));
 	initCFG(cfg);
 	
 	struct FUNCTION *currentFunc = root->FuncList;
 
-	/*while (currentFunc != NULL)
+	while (currentFunc != NULL)
 	{
-		fprintf(cfgStream, "%s\n", currentFunc->ID);
+		fprintf(cfgStream, "%s\n\n", currentFunc->ID);
 		gotoFunction(currentFunc);
 		currentFunc = currentFunc->prev;
-	}*/
+	}
+
+	printGraph(cfg, cfgStream);
 }
 
 void gotoDeclaration(struct DECLARATION* decl)
@@ -66,7 +69,7 @@ void gotoFunction(struct FUNCTION *func)
 		currPar = currPar->prev;
 	}
 
-	gotoCompound(func->CStmt);
+	gotoCompound(func->CStmt, 1, NULL);
 
 }
 
@@ -75,20 +78,24 @@ void gotoParameter(struct PARAMETER *par)
 	gotoIdentifier(par->id);	
 }
 
-void gotoCompound(struct COMPOUNDSTMT *comp)
+void gotoCompound(struct COMPOUNDSTMT *comp, int functionComp, Block* currBlockP)
 {	
 	struct DECLARATION *currDecl = comp->DeclList;
 
-	/*while (currDecl != NULL)
+	if(functionComp) {
+		Block currBlock = createBlock();
+		currBlockP = addBlock(cfg, &currBlock);
+	}
+
+	currBlockP->declarations = currDecl;
+
+	while (currDecl != NULL)
 	{
 		gotoDeclaration(currDecl);
 		currDecl = currDecl->prev;
-	}*/
+	}
 
 	struct STMT *currStmt = comp->StmtList;	
-
-	Block currBlock = createBlock();
-	Block* currBlockP = &currBlock;
 
 	while (currStmt != NULL)
 	{
@@ -99,8 +106,16 @@ void gotoCompound(struct COMPOUNDSTMT *comp)
 
 Block* gotoStatement(struct STMT *stmt, int isAlreadyDeeper, Block* currBlock)
 {
-
 	Block* returnBlock = currBlock;	
+
+	/*Listnode* temp = startNode;
+	while(temp != NULL) {
+		if(if_deepness < temp->deepness) {
+			addConnection(cfg, temp->block->nr, currBlock->nr);
+			deleteNode(temp);
+		}
+		temp = temp->next;
+	} */
 
 	/* statement needs to be switched, because multiple possibilities are available */
 	switch (stmt->e_stmt)
@@ -128,10 +143,13 @@ Block* gotoStatement(struct STMT *stmt, int isAlreadyDeeper, Block* currBlock)
 			break;
 		case eIf:
 			// add Expr of the if to the current block....no idea how to do
-			gotoIf(stmt->stmt.if_s, currBlock);
+			if_deepness++;
+			addStatementToBlock(currBlock, stmt);
+			returnBlock = gotoIf(stmt->stmt.if_s, currBlock);
+			if_deepness--;
 			break;
 		case eCompound:
-			gotoCompound(stmt->stmt.compound_s);
+			gotoCompound(stmt->stmt.compound_s, 0, currBlock);
 			break;
 		case eSemi:
 			break;
@@ -155,10 +173,10 @@ void gotoExpr(struct EXPR *expr)
 			gotoCall(expr->expression.call_expr);
 			break;
 		case eIntnum:
-			//gotoInt(expr->expression.intnum);
+			gotoInt(expr->expression.intnum);
 			break;
 		case eFloatnum:
-			//gotoFloat(expr->expression.floatnum);
+			gotoFloat(expr->expression.floatnum);
 			break;
 		case eId:
 			gotoIDs(expr->expression.ID_expr);
@@ -221,7 +239,7 @@ void gotoWhile(struct WHILEs *whil, Block* currBlock)
 }
 
 void gotoDoWhile(struct DOWHILEs *dowhile, Block* currBlock)
-{
+{	
 	gotoStatement(dowhile->stmt, 1, currBlock);
 	gotoExpr(dowhile->condition);
 }
@@ -234,26 +252,51 @@ void gotoFor(struct FORs *fr, Block* currBlock)
 	gotoStatement(fr->stmt, 1, currBlock);
 }
 
-void gotoIf(struct IFs *iff, Block* currentBlock)
+Block* gotoIf(struct IFs *iff, Block* currentBlock)
 {
+
 	gotoExpr(iff->condition);
-
 	Block ifBlock = createBlock();
-	addConnection(cfg, currentBlock->nr, (&ifBlock)->nr);
-
-	gotoStatement(iff->if_s, 1, &ifBlock);
+	Block* ifBlockP = addBlock(cfg, &ifBlock);
+	addConnection(cfg, currentBlock->nr, ifBlockP->nr);
+	
+	addBlockToList(ifBlockP, if_deepness);
+	gotoStatement(iff->if_s, 1, ifBlockP);
 
 	if (iff->else_s != NULL)
 	{
 		Block elseBlock = createBlock();
-		addConnection(cfg, currentBlock->nr, (&elseBlock)->nr);
+		Block* elseBlockP = addBlock(cfg, &elseBlock);
+		addConnection(cfg, currentBlock->nr, elseBlockP->nr);
 
-		gotoStatement(iff->else_s, 1, &elseBlock);
+		addBlockToList(elseBlockP, if_deepness);
+		gotoStatement(iff->else_s, 1, elseBlockP);
+
+	} else {
+		addBlockToList(currentBlock, if_deepness);
 	}
+
+	Block newBlock = createBlock();
+	return addBlock(cfg, &newBlock);
 }
 
 void gotoIdentifier(struct IDENTIFIER* identifier)
 {	
+	if (identifier->intnum == 0) {
+		//printf("Identifier id: %s\n", identifier->ID);
+	}
+	else {
+		//fprintf(cfgStream, "%s[%d]", identifier->ID, identifier->intnum);
+	}
 }
 
+void gotoInt(int i)
+{
+	//fprintf(cfgStream, "%d", i);
+}
+
+void gotoFloat(float f)
+{
+	//fprintf(cfgStream, "%f", f);
+}
 

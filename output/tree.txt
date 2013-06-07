@@ -1,43 +1,20 @@
-int gEpic;
-float fFloat;
-float fFloat2;
-int fun(int a, float b, float c)
+int fun(int x, int y)
 {
-int temp;
-int i;
-float arr[10];
-temp=0;
-gEpic=0;
-fFloat=0.000000;
-for(i=0;i<10;i=i+1)
+int z;
+float x;
+z=x*y;
+x=z*y;
+if (x<100)
 {
-float temp2;
-gEpic=gEpic+i;
-arr[i]=gEpic/i;
-fFloat=gEpic*i;
-temp=i*i;
-while(temp>0)
+if (x<50)
 {
-fFloat=fFloat-1;
-temp=-1;
+z=200;
 }
+else
 {
-int inComp,iComp2,iComp3;
-inComp=3;
+z=5;
 }
-temp2=fFloat/5;
-do
-{
-temp2=func(2, arr[i], temp2);
+printf(ASDF);
 }
-while(temp2<gEpic);
-}
-}
-int func(float a, int b)
-{
-return (a*(b/fFloat)+gEpic-42);
-}
-int func3()
-{
-return (42);
+y=5;
 }

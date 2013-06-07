@@ -1,5 +1,19 @@
 int fun(int x, int y) {
 	int z;
+	float x;
 
 	z = x * y;
+	x = z * y;
+
+	if(x < 100) {
+		if(x < 50) {
+			z = 200;		
+		} else {
+			z = 5;		
+		}
+
+		printf("ASDF");
+	}
+
+	y = 5;
 }
