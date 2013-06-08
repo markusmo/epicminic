@@ -16,4 +16,6 @@ Block* addBlock(CFG* cfg, Block* block);
 void addConnection(CFG* cfg, int start, int end);
 void doubleArray(CFG* cfg);
 int isLeaf(CFG* cfg, Block* block);
+void optimize(CFG* cfg);
+void optimizeRec(CFG* cfg, int node, char* optimized);
 void printGraph(CFG* cfg, FILE* cfgStream);
