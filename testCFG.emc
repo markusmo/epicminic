@@ -9,8 +9,11 @@ int fun(int x, int y) {
 		if(x < 50) {
 			z = 200;		
 		} 
-		else {
-			y = 3;
+		
+		printf("INBETWEEN_IF");
+
+		if(x > 50) {
+			z = 100;		
 		}
 
 		printf("EMPTYBLOCK");

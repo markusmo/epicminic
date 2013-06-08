@@ -10,9 +10,10 @@ if (x<50)
 {
 z=200;
 }
-else
+printf(INBETWEEN_IF);
+if (x>50)
 {
-y=3;
+z=100;
 }
 printf(EMPTYBLOCK);
 }
