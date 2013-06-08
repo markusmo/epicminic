@@ -1,12 +1,11 @@
 int fun(int x, int y)
 {
 int z;
-if (z)
+float x;
+z=x*y;
+x=z*y;
+if (x<100)
 {
-<<<<<<< HEAD
-if (z)
-z=5;
-=======
 if (x<50)
 {
 z=200;
@@ -17,11 +16,10 @@ if (x>50)
 z=100;
 }
 printf(EMPTYBLOCK);
->>>>>>> 55b767210aa9be337ee93e27f65570c24aa5f516
 }
 else
 {
-z=-5;
+printf(ASDF);
 }
 y=5;
 }

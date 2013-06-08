@@ -283,6 +283,10 @@ Block* gotoIf(struct IFs *iff, Block* currentBlock)
 	{
 		addConnection(cfg, nextBlock2->nr, newBlock.nr);
 	}
+	else
+	{
+		addConnection(cfg, currentBlock->nr, newBlock.nr);
+	}
 
 	return addBlock(cfg, &newBlock);
 }
