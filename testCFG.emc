@@ -12,6 +12,8 @@ int fun(int x, int y) {
 		else {
 			y = 3;
 		}
+
+		printf("EMPTYBLOCK");
 	}
 	else {
 		printf("ASDF");

@@ -14,6 +14,7 @@ else
 {
 y=3;
 }
+printf(EMPTYBLOCK);
 }
 else
 {
