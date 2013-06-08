@@ -138,32 +138,23 @@ int hashset_is_member(hashset_t set, void *item)
     return 0;
 }
 
-hashset_t hashset_union(hashset_t set, hashset_t toJoin)
+/*
+ * added by Markus Mohanty
+ */
+int hashset_union(hashset_t set, hashset_t toJoin)
 {
-    hashset_t new = hashset_create();
-    int len_set = sizeof(set->items) / sizeof(size_t);
-    int len_toJoin = sizeof(set->items) / sizeof(size_t);
+
+    int len_toJoin = sizeof(set->items);    
     
     int i;
-    int j;
-
-    for(i = 0;i<=len_set;i++)
-    {
-        size_t value = set->items[i];
-        if(value !=0)
-        {
-            hashset_add(new, value);
-        }
-    }
-    
     for(i = 0;i<=len_toJoin;i++)
     {
         size_t value = toJoin->items[i];
         if(value !=0)
         {
-            hashset_add(new, value);
+            hashset_add(set, (void*)value);
         }
     }
 
-    return new;
+    return 1;
 }

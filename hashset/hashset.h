@@ -65,11 +65,11 @@ extern "C" {
      */
     int hashset_is_member(hashset_t set, void *item);
 
-    /* peforms a union on two hashsets
-     * 
-     * returns a new hashset with both inputs merged
+    /* peforms a union on two hashsets, adds to set
+     *  added by Markus Mohanty
+     * returns non-zero if success
      */
-    hashset_t hashset_union(hashset_t set, hashset_t toJoin);
+    int hashset_union(hashset_t set, hashset_t toJoin);
 
 #ifdef __cplusplus
 }

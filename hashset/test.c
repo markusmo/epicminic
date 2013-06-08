@@ -148,12 +148,45 @@ static void test_rehashing_items_placed_beyond_nitems(void)
     assert(hashset_is_member(set, (void *)24756480) == 1);
 }
 
+/*
+ * Added by Markus Mohanty
+ *
+ */
+static void test_union()
+{
+    char *items[] = {"zero", "one", "two", "three", NULL};
+    char *items2[] = {"1","2","3","4"};
+    size_t ii, nitems = 4;
+    hashset_t set = hashset_create();
+    hashset_t toJoin = hashset_create();
+
+    if (set == NULL) {
+        fprintf(stderr, "failed to create hashset instance\n");
+        abort();
+    }
+
+    for (ii = 0; ii < nitems; ++ii) {
+        hashset_add(set, items[ii]);
+        hashset_add(toJoin,items2[ii]);
+    }
+
+    int successs = hashset_union(set,toJoin);
+    for(ii = 0; ii < nitems; ii++)
+    {
+        assert(hashset_is_member(set,items2[ii]) == 1);
+    }
+
+
+    assert(successs > 0);
+}
+
 int main(int argc, char *argv[])
 {
     trivial();
     test_gaps();
     test_exceptions();
     test_rehashing_items_placed_beyond_nitems();
+    test_union();
 
     (void)argc;
     (void)argv;
