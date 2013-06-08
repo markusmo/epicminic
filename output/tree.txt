@@ -4,22 +4,13 @@ int z;
 float x;
 z=x*y;
 x=z*y;
-if (x<100)
+while(z>10)
 {
-if (x<50)
+while(x>10)
 {
-z=200;
+x=x-1;
 }
-printf(INBETWEEN_IF);
-if (x>50)
-{
-z=100;
+z=z-1;
 }
-printf(EMPTYBLOCK);
-}
-else
-{
-printf(ASDF);
-}
-y=5;
+printf(z);
 }

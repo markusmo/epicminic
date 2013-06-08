@@ -5,22 +5,13 @@ int fun(int x, int y) {
 	z = x * y;
 	x = z * y;
 
-	if(x < 100) {
-		if(x < 50) {
-			z = 200;		
+	while(z > 10) {
+		while(x > 10) {
+			x = x - 1;
 		} 
-		
-		printf("INBETWEEN_IF");
 
-		if(x > 50) {
-			z = 100;		
-		}
-
-		printf("EMPTYBLOCK");
-	}
-	else {
-		printf("ASDF");
+		z = z -1;
 	}
 
-	y = 5;
+	printf(z);
 }

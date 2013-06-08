@@ -16,13 +16,9 @@
 #include "cfg_creatttor.h"
 
 extern struct PROGRAM *root;
-extern Listnode *startNode;
-extern Listnode *lastNode;
 
 FILE* cfgStream;
 CFG *cfg;
-
-int if_deepness = 0;
 
 int firstBlock = 0;
 
@@ -127,7 +123,7 @@ Block* gotoStatement(struct STMT *stmt, int isAlreadyDeeper, Block* currBlock)
 			gotoExpr(stmt->stmt.return_s);
 			break;
 		case eWhile:
-			gotoWhile(stmt->stmt.while_s, currBlock);
+			returnBlock = gotoWhile(stmt->stmt.while_s, currBlock, stmt);
 			break;
 		case eDoWhile:
 			gotoDoWhile(stmt->stmt.dowhile_s, currBlock);
@@ -137,10 +133,8 @@ Block* gotoStatement(struct STMT *stmt, int isAlreadyDeeper, Block* currBlock)
 			break;
 		case eIf:
 			// add Expr of the if to the current block....no idea how to do
-			if_deepness++;
 			addStatementToBlock(currBlock, stmt);
 			returnBlock = gotoIf(stmt->stmt.if_s, currBlock);
-			if_deepness--;
 			break;
 		case eCompound:
 			returnBlock = gotoCompound(stmt->stmt.compound_s, 0, currBlock);
@@ -226,10 +220,29 @@ void gotoCall(struct CALL *call)
 	}
 }
 
-void gotoWhile(struct WHILEs *whil, Block* currBlock)
+Block* gotoWhile(struct WHILEs *whil, Block* currBlock, struct STMT *currStmt)
 {
 	gotoExpr(whil->condition);
-	gotoStatement(whil->stmt, 1, currBlock);
+
+	Block condition = createBlock();
+	Block* conditionP = addBlock(cfg, &condition);
+	addStatementToBlock(conditionP, currStmt);
+
+	Block body = createBlock();
+	Block* bodyP = addBlock(cfg, &body);
+
+	addConnection(cfg, currBlock->nr, conditionP->nr);
+	addConnection(cfg, conditionP->nr, bodyP->nr);
+
+	Block* lastBlock = gotoStatement(whil->stmt, 1, bodyP);
+	addConnection(cfg, lastBlock->nr, conditionP->nr);
+
+	Block newBlock = createBlock();
+
+	addConnection(cfg, lastBlock->nr, newBlock.nr);
+	addConnection(cfg, conditionP->nr, newBlock.nr);
+
+	return addBlock(cfg, &newBlock);
 }
 
 void gotoDoWhile(struct DOWHILEs *dowhile, Block* currBlock)
@@ -258,7 +271,6 @@ Block* gotoIf(struct IFs *iff, Block* currentBlock)
 	Block* ifBlockP = addBlock(cfg, &ifBlock);
 	addConnection(cfg, currentBlock->nr, ifBlockP->nr);
 	
-	addBlockToList(ifBlockP, if_deepness);
 	Block* nextBlock = gotoStatement(iff->if_s, 1, ifBlockP);
 
 	if (iff->else_s != NULL)
@@ -268,11 +280,8 @@ Block* gotoIf(struct IFs *iff, Block* currentBlock)
 		Block* elseBlockP = addBlock(cfg, &elseBlock);
 		addConnection(cfg, currentBlock->nr, elseBlockP->nr);
 
-		addBlockToList(elseBlockP, if_deepness);
 		nextBlock2 = gotoStatement(iff->else_s, 1, elseBlockP);
 
-	} else {
-		addBlockToList(currentBlock, if_deepness);
 	}
 
 	Block newBlock = createBlock();

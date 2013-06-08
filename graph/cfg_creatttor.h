@@ -18,7 +18,7 @@ void gotoIDs(struct IDs *ids);
 void gotoArgument(struct ARGLIST *arg);
 void gotoAssign(struct ASSIGN *assign);
 void gotoCall(struct CALL *call);
-void gotoWhile(struct WHILEs *whil, Block* currBlock);
+Block* gotoWhile(struct WHILEs *whil, Block* currBlock, struct STMT *currStmt);
 void gotoDoWhile(struct DOWHILEs *dowhile, Block* currBlock);
 void gotoFor(struct FORs *fr, Block* currBlock);
 Block* gotoIf(struct IFs *iff, Block* currentBlock);

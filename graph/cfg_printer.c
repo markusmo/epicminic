@@ -219,7 +219,7 @@ void printCFGWhile(struct WHILEs *whil)
 	printCFGExpr(whil->condition);
 	fprintf(cfgStream, ")\n");
 
-	printCFGStatement(whil->stmt);
+	//printCFGStatement(whil->stmt);
 }
 
 void printCFGDoWhile(struct DOWHILEs *dowhile)
