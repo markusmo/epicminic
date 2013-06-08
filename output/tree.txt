@@ -1,23 +1,14 @@
 int fun(int x, int y)
 {
 int z;
-float x;
-z=x*y;
-x=z*y;
-if (x<100)
+if (z)
 {
-if (x<50)
-{
-z=200;
+if (z)
+z=5;
 }
 else
 {
-y=3;
-}
-}
-else
-{
-printf(ASDF);
+z=-5;
 }
 y=5;
 }
