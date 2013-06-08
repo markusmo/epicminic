@@ -126,10 +126,10 @@ Block* gotoStatement(struct STMT *stmt, int isAlreadyDeeper, Block* currBlock)
 			returnBlock = gotoWhile(stmt->stmt.while_s, currBlock, stmt);
 			break;
 		case eDoWhile:
-			gotoDoWhile(stmt->stmt.dowhile_s, currBlock);
+			returnBlock = gotoDoWhile(stmt->stmt.dowhile_s, currBlock, stmt);
 			break;
 		case eFor:
-			gotoFor(stmt->stmt.for_s, currBlock);
+			returnBlock = gotoFor(stmt->stmt.for_s, currBlock, stmt);
 			break;
 		case eIf:
 			// add Expr of the if to the current block....no idea how to do
@@ -239,24 +239,64 @@ Block* gotoWhile(struct WHILEs *whil, Block* currBlock, struct STMT *currStmt)
 
 	Block newBlock = createBlock();
 
-	addConnection(cfg, lastBlock->nr, newBlock.nr);
+	//addConnection(cfg, lastBlock->nr, newBlock.nr);
 	addConnection(cfg, conditionP->nr, newBlock.nr);
 
 	return addBlock(cfg, &newBlock);
 }
 
-void gotoDoWhile(struct DOWHILEs *dowhile, Block* currBlock)
-{	
+Block* gotoDoWhile(struct DOWHILEs *dowhile, Block* currBlock, struct STMT *currStmt)
+{
 	gotoStatement(dowhile->stmt, 1, currBlock);
+
+	Block body = createBlock();
+	Block* bodyP = addBlock(cfg, &body);
+
+	addConnection(cfg, currBlock->nr, bodyP->nr);
+
+	Block* lastBlock = gotoStatement(dowhile->stmt, 1, bodyP);
+
+	Block condition = createBlock();
+	Block* conditionP = addBlock(cfg, &condition);
+	addStatementToBlock(conditionP, currStmt);
+	//addConnection(cfg, bodyP->nr, conditionP->nr);
+	addConnection(cfg, lastBlock->nr, conditionP->nr);
+
 	gotoExpr(dowhile->condition);
+
+	Block newBlock = createBlock();
+
+	addConnection(cfg, conditionP->nr, bodyP->nr);
+	addConnection(cfg, conditionP->nr, newBlock.nr);
+
+	return addBlock(cfg, &newBlock);
 }
 
-void gotoFor(struct FORs *fr, Block* currBlock)
+Block* gotoFor(struct FORs *fr, Block* currBlock, struct STMT *currStmt)
 {
 	gotoAssign(fr->init);
 	gotoExpr(fr->condition);
 	gotoAssign(fr->next);
-	gotoStatement(fr->stmt, 1, currBlock);
+
+	Block condition = createBlock();
+	Block* conditionP = addBlock(cfg, &condition);
+	addStatementToBlock(conditionP, currStmt);
+
+	Block body = createBlock();
+	Block* bodyP = addBlock(cfg, &body);
+
+	addConnection(cfg, currBlock->nr, conditionP->nr);
+	addConnection(cfg, conditionP->nr, bodyP->nr);
+
+	Block* lastBlock = gotoStatement(fr->stmt, 1, bodyP);
+	addConnection(cfg, lastBlock->nr, conditionP->nr);
+
+	Block newBlock = createBlock();
+
+	//addConnection(cfg, lastBlock->nr, newBlock.nr);
+	addConnection(cfg, conditionP->nr, newBlock.nr);
+
+	return addBlock(cfg, &newBlock);
 }
 
 Block* gotoIf(struct IFs *iff, Block* currentBlock)

@@ -5,8 +5,8 @@ int fun(int x, int y) {
 	z = x * y;
 	x = z * y;
 
-	while(z > 10) {
-		while(x > 10) {
+	for(z = 0; z < 10; z = z + 1) {
+		while (x < 10) {
 			x = x - 1;
 		} 
 

@@ -82,19 +82,8 @@ void printGraph(CFG* cfg, FILE* cfgStream)
 	int a,b;
 	setStream(cfgStream);
 
-	for (a = 0; a < 5; a++)
-	{
-		for (b = 0; b < 5; b++)
-		{
-			fprintf(cfgStream, "%d\t", cfg->matrix[a][b]);
-		}
-		fprintf(cfgStream, "\n");
-	}
-	
-	fprintf(cfgStream, "\n\n\n");
-
 	int i;
-	for (i = 0; i < cfg->currentSize; i++)
+	for (i = 0; i < cfg->currentEntries; i++)
 	{
 		//if(cfg->blocks[i].declarations != NULL || cfg->blocks[i].statements != NULL) {
 			fprintf(cfgStream, "B%d\n{\n", i);
@@ -123,7 +112,7 @@ void printGraph(CFG* cfg, FILE* cfgStream)
 			//TODO all somehow in one loop??
 			fprintf(cfgStream, "Predecessor: ");
 			int j;
-			for (j = 0; j < cfg->currentSize; j++)
+			for (j = 0; j < cfg->currentEntries; j++)
 			{
 				if (cfg->matrix[j][cfg->blocks[i].nr] == 1)
 				{
@@ -132,7 +121,7 @@ void printGraph(CFG* cfg, FILE* cfgStream)
 			}
 
 			fprintf(cfgStream, "\nSuccessor: ");
-			for (j = 0; j < cfg->currentSize; j++)
+			for (j = 0; j < cfg->currentEntries; j++)
 			{
 				if (cfg->matrix[cfg->blocks[i].nr][j] == 1)
 				{

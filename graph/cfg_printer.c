@@ -222,10 +222,13 @@ void printCFGWhile(struct WHILEs *whil)
 	//printCFGStatement(whil->stmt);
 }
 
-void printCFGDoWhile(struct DOWHILEs *dowhile)
+void printCFGDo(struct DOWHILEs *dowhile)
 {	
 	fprintf(cfgStream, "do\n");
-	printCFGStatement(dowhile->stmt);
+}
+
+void printCFGDoWhile(struct DOWHILEs *dowhile)
+{	
 	fprintf(cfgStream, "while(");
 	printCFGExpr(dowhile->condition);
 	fprintf(cfgStream, ");\n");
@@ -240,7 +243,7 @@ void printCFGFor(struct FORs *fr)
 	fprintf(cfgStream, ";");
 	printCFGAssign(fr->next);
 	fprintf(cfgStream, ")\n");
-	printCFGStatement(fr->stmt);
+	//printCFGStatement(fr->stmt);
 }
 
 void printCFGIf(struct IFs *iff)
