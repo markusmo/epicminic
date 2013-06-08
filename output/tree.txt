@@ -3,8 +3,21 @@ int fun(int x, int y)
 int z;
 if (z)
 {
+<<<<<<< HEAD
 if (z)
 z=5;
+=======
+if (x<50)
+{
+z=200;
+}
+printf(INBETWEEN_IF);
+if (x>50)
+{
+z=100;
+}
+printf(EMPTYBLOCK);
+>>>>>>> 55b767210aa9be337ee93e27f65570c24aa5f516
 }
 else
 {

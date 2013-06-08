@@ -79,7 +79,7 @@ void gotoParameter(struct PARAMETER *par)
 	gotoIdentifier(par->id);	
 }
 
-void gotoCompound(struct COMPOUNDSTMT *comp, int functionComp, Block* currBlockP)
+Block* gotoCompound(struct COMPOUNDSTMT *comp, int functionComp, Block* currBlockP)
 {	
 	struct DECLARATION *currDecl = comp->DeclList;
 
@@ -103,6 +103,8 @@ void gotoCompound(struct COMPOUNDSTMT *comp, int functionComp, Block* currBlockP
 		currBlockP = gotoStatement(currStmt, 0, currBlockP);
 		currStmt = currStmt->prev;
 	}
+
+	return currBlockP;
 }
 
 Block* gotoStatement(struct STMT *stmt, int isAlreadyDeeper, Block* currBlock)
@@ -138,11 +140,10 @@ Block* gotoStatement(struct STMT *stmt, int isAlreadyDeeper, Block* currBlock)
 			if_deepness++;
 			addStatementToBlock(currBlock, stmt);
 			returnBlock = gotoIf(stmt->stmt.if_s, currBlock);
-
 			if_deepness--;
 			break;
 		case eCompound:
-			gotoCompound(stmt->stmt.compound_s, 0, currBlock);
+			returnBlock = gotoCompound(stmt->stmt.compound_s, 0, currBlock);
 			break;
 		case eSemi:
 			break;
@@ -247,6 +248,7 @@ void gotoFor(struct FORs *fr, Block* currBlock)
 
 Block* gotoIf(struct IFs *iff, Block* currentBlock)
 {
+
 	int elseNr = -1;
 	Block* nextBlock2;
 
@@ -255,7 +257,6 @@ Block* gotoIf(struct IFs *iff, Block* currentBlock)
 	
 	Block* ifBlockP = addBlock(cfg, &ifBlock);
 	addConnection(cfg, currentBlock->nr, ifBlockP->nr);
-	printf("258: %d -> %d\n", currentBlock->nr, ifBlockP->nr);
 	
 	addBlockToList(ifBlockP, if_deepness);
 	Block* nextBlock = gotoStatement(iff->if_s, 1, ifBlockP);
@@ -266,7 +267,6 @@ Block* gotoIf(struct IFs *iff, Block* currentBlock)
 		elseNr = elseBlock.nr;
 		Block* elseBlockP = addBlock(cfg, &elseBlock);
 		addConnection(cfg, currentBlock->nr, elseBlockP->nr);
-		printf("269: %d -> %d\n", currentBlock->nr, elseBlockP->nr);
 
 		addBlockToList(elseBlockP, if_deepness);
 		nextBlock2 = gotoStatement(iff->else_s, 1, elseBlockP);
@@ -278,12 +278,10 @@ Block* gotoIf(struct IFs *iff, Block* currentBlock)
 	Block newBlock = createBlock();
 	
 	addConnection(cfg, nextBlock->nr, newBlock.nr);
-	printf("281 (%d): %d -> %d\n", ifBlock.nr, nextBlock->nr, newBlock.nr);
 
 	if (elseNr >= 0)
 	{
 		addConnection(cfg, nextBlock2->nr, newBlock.nr);
-		printf("286: %d -> %d\n", nextBlock2->nr, newBlock.nr);
 	}
 
 	return addBlock(cfg, &newBlock);

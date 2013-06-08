@@ -7,7 +7,7 @@ void generateCFG(FILE *astStreamPar);
 
 void gotoFunction(struct FUNCTION *func);
 void gotoParameter(struct PARAMETER *par);
-void gotoCompound(struct COMPOUNDSTMT *comp, int functionComp, Block* currBlockP);
+Block* gotoCompound(struct COMPOUNDSTMT *comp, int functionComp, Block* currBlockP);
 Block* gotoStatement(struct STMT *stmt, int isAlreadyDeeper, Block* currBlock);
 void gotoExpr(struct EXPR *expr);
 void gotoInt(int i);
