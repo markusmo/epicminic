@@ -76,6 +76,49 @@ int isLeaf(CFG* cfg, Block* block)
 	return 1;
 }
 
+void optimize(CFG* cfg)
+{
+	char* optimized = (char*) calloc(cfg->currentEntries, sizeof(char));
+	optimizeRec(cfg, 0, optimized);
+	free(optimized);
+}
+
+void optimizeRec(CFG* cfg, int node, char* optimized)
+{
+	int i;
+	optimized[node] = 1; //Mark as already optimized
+
+	for (i = 0; i < cfg->currentEntries; i++)
+	{
+		if (cfg->matrix[node][i] == 1)
+		{
+			Block current = cfg->blocks[i];
+			if (current.declarations == NULL && current.statements == NULL)
+			{
+				cfg->matrix[node][i] = 0;
+				int j;
+				
+				for (j = 0; j < cfg->currentEntries; j++)
+				{
+					if (cfg->matrix[i][j] == 1)
+					{
+						cfg->matrix[i][j] = 0;
+						cfg->matrix[node][j] = 1;
+					}
+				}
+				
+				if (optimized[j] == 0)
+					optimizeRec(cfg, j, optimized);
+			}
+			else
+			{
+				if (optimized[i] == 0)
+					optimizeRec(cfg, i, optimized);
+			}
+		}
+	}
+}
+
 void printGraph(CFG* cfg, FILE* cfgStream)
 {
 
@@ -85,7 +128,7 @@ void printGraph(CFG* cfg, FILE* cfgStream)
 	int i;
 	for (i = 0; i < cfg->currentEntries; i++)
 	{
-		//if(cfg->blocks[i].declarations != NULL || cfg->blocks[i].statements != NULL) {
+		if(cfg->blocks[i].declarations != NULL || cfg->blocks[i].statements != NULL) {
 			fprintf(cfgStream, "B%d\n{\n", i);
 			if(cfg->blocks[i].declarations != NULL) 
 			{ 	
@@ -130,5 +173,5 @@ void printGraph(CFG* cfg, FILE* cfgStream)
 			}
 			fprintf(cfgStream, "\n\n");
 		}
-	//}
+	}
 }

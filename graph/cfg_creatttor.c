@@ -42,6 +42,7 @@ void generateCFG(FILE *cfgStreamPar)
 		currentFunc = currentFunc->prev;
 	}
 
+	optimize(cfg);
 	printGraph(cfg, cfgStream);
 }
 
