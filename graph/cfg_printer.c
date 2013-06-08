@@ -80,6 +80,9 @@ void printCFGCompound(struct COMPOUNDSTMT *comp)
 
 void printCFGStatement(struct STMT *stmt)
 {
+	
+	if(stmt == NULL)
+		return;
 	/* statement needs to be switched, because multiple possibilities are available */
 	switch (stmt->e_stmt)
 	{
