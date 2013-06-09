@@ -74,6 +74,22 @@ void generateLiveliness(FILE *astStreamPar)
 				liveStatement(stmt);
 				stmt = stmt->prev;			
 			}
+
+			currentBlockNr++;
+		}
+
+		for (i = 0; i < currGraph->currentEntries; i++)
+		{
+			if(currGraph->blocks[i].statements == NULL && currGraph->blocks[i].declarations == NULL)
+				continue;
+			
+			printf("Def-set B%d:\n", i);
+			hashset_print(def_set[i]);
+			printf("\n");
+
+			printf("Use-set B%d:\n", i);
+			hashset_print(use_set[i]);
+			printf("\n\n");
 		}
 
 		postOrderTraversal(currGraph, currGraph->blocks[0]);			
@@ -100,7 +116,6 @@ void postOrderTraversalRec(CFG* graph, Block block, char* traversed) {
 			postOrderTraversalRec(graph, graph->blocks[j], traversed);
 		}
 	}
-	printf("Actual node: B%d\n", block.nr);
 }
 
 void liveCompound(struct COMPOUNDSTMT *comp) {
@@ -197,6 +212,8 @@ void liveIDs(struct IDs *ids, int use) {
 
 void liveAssign(struct ASSIGN *assign) {
 
+	hashset_add(def_set[currentBlockNr], assign->ID);
+
 	if (assign->index != NULL)
 	{
 		liveExpr(assign->index, 0);
@@ -222,14 +239,7 @@ void liveDeclaration(struct DECLARATION* decl) {
 
 	while (currIdent != NULL)
 	{
-		liveIdentifier(currIdent);
+		hashset_add(def_set[currentBlockNr], currIdent->ID);
 		currIdent = currIdent->prev;
-	}
-}
-
-void liveIdentifier(struct IDENTIFIER* identifier) {
-	if (identifier->intnum == 0) {
-	}
-	else {
 	}
 }
