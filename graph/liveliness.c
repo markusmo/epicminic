@@ -19,10 +19,10 @@
 
 extern List* graphList;
 
-hashset_t in_set;
-hashset_t use_set;
-hashset_t def_set;
-hashset_t out_set;
+hashset_t* in_set;
+hashset_t* use_set;
+hashset_t* def_set;
+hashset_t* out_set;
 
 List* closeList;
 int currentBlockNr;
@@ -39,15 +39,22 @@ void generateLiveliness(FILE *astStreamPar)
 		CFG* currGraph = (CFG*) temp->data;
 		fprintf(astStreamPar, "%s\n\n", temp->funcName);
 
-		in_set = (hashset_t) calloc(currGraph->currentEntries, sizeof(struct hashset_st));
-		use_set = (hashset_t) calloc(currGraph->currentEntries, sizeof(struct hashset_st));
-		kill_set = (hashset_t) calloc(currGraph->currentEntries, sizeof(struct hashset_st));
-		out_set = (hashset_t) calloc(currGraph->currentEntries, sizeof(struct hashset_st));
-
+		in_set = (hashset_t*) calloc(currGraph->currentEntries, sizeof(hashset_t));
+		use_set = (hashset_t*) calloc(currGraph->currentEntries, sizeof(hashset_t));
+		def_set = (hashset_t*) calloc(currGraph->currentEntries, sizeof(hashset_t));
+		out_set = (hashset_t*) calloc(currGraph->currentEntries, sizeof(hashset_t));
 		
+		int i;
+		for (i = 0; i < currGraph->currentEntries; i++)
+		{
+			in_set[i] = hashset_create();
+			use_set[i] = hashset_create();
+			def_set[i] = hashset_create();
+			out_set[i] = hashset_create();
+		}
 
 		// initialize
-		int i;
+		
 		for(i = 0; i < currGraph->currentEntries; i++) {
 			if(currGraph->blocks[i].statements == NULL && currGraph->blocks[i].declarations == NULL)
 				continue;
