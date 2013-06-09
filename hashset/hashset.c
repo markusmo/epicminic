@@ -16,6 +16,7 @@
  */
 
 #include "hashset.h"
+#include <stdio.h>
 #include <assert.h>
 
 static const unsigned int prime_1 = 73;
@@ -53,19 +54,18 @@ void hashset_destroy(hashset_t set)
     free(set);
 }
 
-static int hashset_add_member(hashset_t set, void *item)
+static int hashset_add_member(hashset_t set, char *item)
 {
-    size_t value = (size_t)item;
     size_t ii;
 
-    if (value == 0 || value == 1) {
+    if (item == NULL) {
         return -1;
     }
 
-    ii = set->mask & (prime_1 * value);
+    ii = set->mask & (prime_1 * ((size_t)item));
 
-    while (set->items[ii] != 0 && set->items[ii] != 1) {
-        if (set->items[ii] == value) {
+    while ((size_t)set->items[ii] != 0 && (size_t)set->items[ii] != 1) {
+        if (strcmp(set->items[ii], item) == 0) {
             return 0;
         } else {
             /* search free slot */
@@ -73,13 +73,13 @@ static int hashset_add_member(hashset_t set, void *item)
         }
     }
     set->nitems++;
-    set->items[ii] = value;
+    set->items[ii] = item;
     return 1;
 }
 
 static void maybe_rehash(hashset_t set)
 {
-    size_t *old_items;
+    char **old_items;
     size_t old_capacity, ii;
 
 
@@ -89,7 +89,7 @@ static void maybe_rehash(hashset_t set)
         set->nbits++;
         set->capacity = (size_t)(1 << set->nbits);
         set->mask = set->capacity - 1;
-        set->items = calloc(set->capacity, sizeof(size_t));
+        set->items = calloc(set->capacity, sizeof(char*));
         set->nitems = 0;
         assert(set->items);
         for (ii = 0; ii < old_capacity; ii++) {
@@ -99,21 +99,20 @@ static void maybe_rehash(hashset_t set)
     }
 }
 
-int hashset_add(hashset_t set, void *item)
+int hashset_add(hashset_t set, char *item)
 {
     int rv = hashset_add_member(set, item);
     maybe_rehash(set);
     return rv;
 }
 
-int hashset_remove(hashset_t set, void *item)
+int hashset_remove(hashset_t set, char *item)
 {
-    size_t value = (size_t)item;
-    size_t ii = set->mask & (prime_1 * value);
+    size_t ii = set->mask & (prime_1 * ((size_t)item));
 
     while (set->items[ii] != 0) {
-        if (set->items[ii] == value) {
-            set->items[ii] = 1;
+        if (set->items[ii] == item) {
+            set->items[ii] = (char*)1;
             set->nitems--;
             return 1;
         } else {
@@ -123,13 +122,12 @@ int hashset_remove(hashset_t set, void *item)
     return 0;
 }
 
-int hashset_is_member(hashset_t set, void *item)
+int hashset_is_member(hashset_t set, char *item)
 {
-    size_t value = (size_t)item;
-    size_t ii = set->mask & (prime_1 * value);
+    size_t ii = set->mask & (prime_1 * ((size_t)item));
 
     while (set->items[ii] != 0) {
-        if (set->items[ii] == value) {
+        if (set->items[ii] == item) {
             return 1;
         } else {
             ii = set->mask & (ii + prime_2);
@@ -141,7 +139,7 @@ int hashset_is_member(hashset_t set, void *item)
 /*
  * added by Markus Mohanty
  */
-int hashset_union(hashset_t set, hashset_t toJoin)
+void hashset_union(hashset_t set, hashset_t toJoin)
 {
 
     int len_toJoin = sizeof(set->items);    
@@ -149,14 +147,12 @@ int hashset_union(hashset_t set, hashset_t toJoin)
     int i;
     for(i = 0;i<=len_toJoin;i++)
     {
-        size_t value = toJoin->items[i];
+        char* value = toJoin->items[i];
         if(value !=0)
         {
-            hashset_add(set, (void*)value);
+            hashset_add(set, value);
         }
     }
-
-    return 1;
 }
 
 void hashset_print(hashset_t set)
@@ -167,14 +163,12 @@ void hashset_print(hashset_t set)
     int i;
     for(i = 0; i < len; i++)
     {
-        size_t value = set->items[i];
+        char* value = set->items[i];
         if(value != 0)
         {
-            printf("%d, ", value);
+            printf("%s, ", value);
         }
     }
 
     printf(" }");
-
-    return 1;
 }

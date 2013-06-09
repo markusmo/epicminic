@@ -29,7 +29,7 @@ extern "C" {
         size_t mask;
 
         size_t capacity;
-        size_t *items;
+        char **items;
         size_t nitems;
     };
 
@@ -50,26 +50,25 @@ extern "C" {
      *
      * returns zero if the item already in the set and non-zero otherwise
      */
-    int hashset_add(hashset_t set, void *item);
+    int hashset_add(hashset_t set, char *item);
 
     /* remove item from the hashset
      *
      * returns non-zero if the item was removed and zero if the item wasn't
      * exist
      */
-    int hashset_remove(hashset_t set, void *item);
+    int hashset_remove(hashset_t set, char *item);
 
     /* check if existence of the item
      *
      * returns non-zero if the item exists and zero otherwise
      */
-    int hashset_is_member(hashset_t set, void *item);
+    int hashset_is_member(hashset_t set, char *item);
 
     /* peforms a union on two hashsets, adds to set
      *  added by Markus Mohanty
-     * returns non-zero if success
      */
-    int hashset_union(hashset_t set, hashset_t toJoin);
+    void hashset_union(hashset_t set, hashset_t toJoin);
 
     void hashset_print(hashset_t set);
 
