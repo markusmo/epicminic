@@ -158,3 +158,23 @@ int hashset_union(hashset_t set, hashset_t toJoin)
 
     return 1;
 }
+
+void hashset_print(hashset_t set)
+{
+    int len = sizeof(set->items);    
+    printf("{ ");
+
+    int i;
+    for(i = 0; i < len; i++)
+    {
+        size_t value = set->items[i];
+        if(value != 0)
+        {
+            printf("%d, ", value);
+        }
+    }
+
+    printf(" }");
+
+    return 1;
+}
