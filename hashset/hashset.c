@@ -15,6 +15,7 @@
  *   limitations under the License.
  */
 
+#include <stdio.h>
 #include "hashset.h"
 #include <stdio.h>
 #include <assert.h>
@@ -164,7 +165,7 @@ void hashset_print(hashset_t set)
     for(i = 0; i < len; i++)
     {
         char* value = set->items[i];
-        if(value != 0)
+        if(value != NULL)
         {
             printf("%s, ", value);
         }
