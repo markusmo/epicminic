@@ -21,10 +21,11 @@ extern List* graphList;
 
 hashset_t in_set;
 hashset_t use_set;
-hashset_t kill_set;
+hashset_t def_set;
 hashset_t out_set;
 
 List* closeList;
+int currentBlockNr;
 
 void generateLiveliness(FILE *astStreamPar)
 {
@@ -42,6 +43,31 @@ void generateLiveliness(FILE *astStreamPar)
 		use_set = (hashset_t) calloc(currGraph->currentEntries, sizeof(struct hashset_st));
 		kill_set = (hashset_t) calloc(currGraph->currentEntries, sizeof(struct hashset_st));
 		out_set = (hashset_t) calloc(currGraph->currentEntries, sizeof(struct hashset_st));
+
+		
+
+		// initialize
+		int i;
+		for(i = 0; i < currGraph->currentEntries; i++) {
+			if(currGraph->blocks[i].statements == NULL && currGraph->blocks[i].declarations == NULL)
+				continue;
+
+			currentBlockNr = currGraph->blocks[i].nr;
+
+			struct DECLARATION* decl = currGraph->blocks[i].declarations;
+			
+			while(decl != NULL) {
+				liveDeclaration(decl);
+				decl = decl->prev;			
+			}
+
+			struct STMT* stmt = currGraph->blocks[i].statements;			
+		
+			while(stmt != NULL) {
+				liveStatement(stmt);
+				stmt = stmt->prev;			
+			}
+		}
 
 		postOrderTraversal(currGraph, currGraph->blocks[0]);			
 
@@ -70,42 +96,133 @@ void postOrderTraversalRec(CFG* graph, Block block, char* traversed) {
 	printf("Actual node: B%d\n", block.nr);
 }
 
-void liveFunction(struct FUNCTION *func)
-{
+void liveCompound(struct COMPOUNDSTMT *comp) {
+	
+	struct DECLARATION *currDecl = comp->DeclList;
+
+	while (currDecl != NULL)
+	{
+		liveDeclaration(currDecl);
+		currDecl = currDecl->prev;
+	}
+
+	struct STMT *currStmt = comp->StmtList;	
+
+	while (currStmt != NULL)
+	{
+		liveStatement(currStmt);
+		currStmt = currStmt->prev;
+	}
 }
-void liveParameter(struct PARAMETER *par)
-{
+
+void liveStatement(struct STMT *stmt) {
+	
+	if(stmt == NULL)
+		return;
+	/* statement needs to be switched, because multiple possibilities are available */
+	switch (stmt->e_stmt)
+	{
+		case eAssign:
+			liveAssign(stmt->stmt.assign_s);
+			break;
+		case eCall:
+			liveCall(stmt->stmt.call_s);
+			break;
+		case eRet:
+			liveExpr(stmt->stmt.return_s, 1);
+			break;
+		case eWhile:
+			liveExpr(stmt->stmt.while_s->condition, 1);
+			break;
+		case eDoWhile:
+			liveExpr(stmt->stmt.dowhile_s->condition, 1);
+			break;
+		case eFor:
+			liveAssign(stmt->stmt.for_s->init);
+			liveExpr(stmt->stmt.for_s->condition, 1);
+			liveAssign(stmt->stmt.for_s->next);
+			break;
+		case eIf:
+			liveExpr(stmt->stmt.if_s->condition, 1);
+			break;
+		case eCompound:
+			liveCompound(stmt->stmt.compound_s);
+			break;
+	}
 }
-void liveExpr(struct EXPR *expr)
-{
+
+void liveExpr(struct EXPR *expr, int use) {
+	
+	switch(expr->e_expr)
+	{
+		case eUnop:
+			liveExpr(expr->expression.unop_expr->expr, use);
+			break;
+		case eBinop:
+			liveExpr(expr->expression.binop_expr->expr1, use);
+			liveExpr(expr->expression.binop_expr->expr2, use);
+			break;
+		case eCallExpr:
+			liveCall(expr->expression.call_expr);
+			break;
+		case eId:
+			liveIDs(expr->expression.ID_expr, use);
+			break;
+		case eExpr:
+			liveExpr(expr->expression.bracket, use);
+			break;
+	}
 }
-void liveInt(int i)
-{
+
+void liveIDs(struct IDs *ids, int use) {
+
+	if(use) {
+		hashset_add(use_set[currentBlockNr], ids->ID);	
+	} else {
+		hashset_add(def_set[currentBlockNr], ids->ID);	
+	}
+	
+	if (ids->expr != NULL)
+	{
+		liveExpr(ids->expr, use);
+	}
 }
-void liveFloat(float f)
-{
+
+void liveAssign(struct ASSIGN *assign) {
+
+	if (assign->index != NULL)
+	{
+		liveExpr(assign->index, 0);
+	}
+
+	liveExpr(assign->expr, 1);
 }
-void liveUnop(struct UNOP *un)
-{
+
+void liveCall(struct CALL *call) {
+
+	struct ARGLIST *currArg = call->arg;
+
+	while (currArg != NULL)
+	{
+		liveExpr(currArg->expr, 1);
+		currArg = currArg->prev;
+	}
 }
-void liveBinop(struct BINOP *bin)
-{
+
+void liveDeclaration(struct DECLARATION* decl) {
+	
+	struct IDENTIFIER *currIdent = decl->ilist;
+
+	while (currIdent != NULL)
+	{
+		liveIdentifier(currIdent);
+		currIdent = currIdent->prev;
+	}
 }
-void liveIDs(struct IDs *ids)
-{
-}
-void liveArgument(struct ARGLIST *arg)
-{
-}
-void liveAssign(struct ASSIGN *assign)
-{
-}
-void liveCall(struct CALL *call)
-{
-}
-void liveDeclaration(struct DECLARATION* decl)
-{
-}
-void liveIdentifier(struct IDENTIFIER* identifier)
-{
+
+void liveIdentifier(struct IDENTIFIER* identifier) {
+	if (identifier->intnum == 0) {
+	}
+	else {
+	}
 }
