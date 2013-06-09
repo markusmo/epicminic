@@ -53,7 +53,8 @@ int main(int argc, char *argv[])
 			//set_timer();		
 			generateOutput(astFile, tableFile);
 			set_timer();			
-			generateCFG(cfaFile); //, lifenessFile);
+			generateCFG(cfaFile);
+			generateLiveliness(lifenessFile);
 			double time = get_timer();
 			printf("EPIC TOTAL TIME: %f\n", time);
 		}

@@ -21,6 +21,7 @@ FILE* cfgStream;
 CFG *cfg;
 
 int firstBlock = 0;
+List* graphList;
 
 
 /*
@@ -30,7 +31,9 @@ int firstBlock = 0;
 void generateCFG(FILE *cfgStreamPar)
 {	
 	cfgStream = cfgStreamPar;
-	
+	graphList = (List*) malloc(sizeof(List));
+	initList(graphList);	
+
 	struct FUNCTION *currentFunc = root->FuncList;
 
 	while (currentFunc != NULL)
@@ -44,7 +47,7 @@ void generateCFG(FILE *cfgStreamPar)
 		
 		optimize(cfg);
 		printGraph(cfg, cfgStream);
-		addGraphToList(cfg);
+		addItemToList(graphList, cfg, currentFunc->ID);
 
 		currentFunc = currentFunc->prev;
 	}

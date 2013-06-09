@@ -4,43 +4,71 @@
 
 #include "list.h"
 
-Listnode *startNode;
-Listnode *lastNode;
-int listCounter = 0;
 
-void addGraphToList(CFG* graph) {
+void initList(List* list) {
+	list->nodeCounter = 0;
+	clearList(list);
+}
+
+void addItemToList(List* list, void* data, char* funcName) {
 	
-	Listnode* ln = malloc(sizeof(Listnode));
-	ln->graph = graph;
+	Listnode* ln = (Listnode*) malloc(sizeof(Listnode));
+	ln->data = data;
 	ln->next = NULL;
 	ln->prev = NULL;
-	ln->nr = listCounter++;
+	ln->funcName = funcName;
+	ln->nr = list->nodeCounter++;
 
-	if(startNode == NULL) {
-		startNode = ln;
+	if(list->startNode == NULL) {
+		list->startNode = ln;
 	} else {
-		lastNode->next = ln;
-		ln->prev = lastNode;
+		list->lastNode->next = ln;
+		ln->prev = list->lastNode;
 	}
 
-	lastNode = ln;
+	list->lastNode = ln;
 }
 
-void clearList() {
-	startNode = NULL;
-	lastNode = NULL;
+void clearList(List* list) {
+	list->startNode = NULL;
+	list->lastNode = NULL;
 }
 
-void deleteNode(Listnode* node) {
+void deleteNode(List* list, Listnode* node) {
 	if(node->prev != NULL && node->next != NULL) {
 		node->prev->next = node->next;
 	} else if(node->prev != NULL && node->next == NULL) {
-		lastNode = node->prev;
+		list->lastNode = node->prev;
 		node->prev->next = NULL;
 	} else if(node->prev == NULL && node->next != NULL) {
-		startNode->next->prev = NULL;
-		startNode = node->next;
+		list->startNode->next->prev = NULL;
+		list->startNode = node->next;
 	} else {
-		clearList();	
+		clearList(list);	
 	}
+}
+
+int isDataInList(List* list, void* data) {
+	Listnode* temp = list->startNode;
+
+	while(temp != NULL) {
+		if(temp->data == data) {
+			return 1;
+		}
+		temp = temp->next;	
+	}	
+
+	return 0;
+}
+
+void printList(List* list) {
+	Listnode* temp = list->startNode;
+
+	while(temp != NULL) {
+		Block* t1 = (Block*) temp->data;
+		printf("B%d, ", t1->nr);		
+		temp = temp->next;			
+	}
+
+	printf("\n");
 }
