@@ -1,17 +1,16 @@
-#if !defined(BLOCK)
-#define BLOCK
-#include "block.h"
+#if !defined(GRAPH)
+#define GRAPH
+#include "graph.h"
 #endif
 
 typedef struct ListNode {
 	int nr;
-	int deepness;
 	struct ListNode* next;
 	struct ListNode* prev;
-	struct Block* block;
+	struct CFG* graph;
 } Listnode;
 
-void addBlockToList(Block* block, int deepness);
+void addGraphToList(CFG* graph);
 void clearList();
 void deleteNode(Listnode* node);
 

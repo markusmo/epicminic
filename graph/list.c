@@ -8,11 +8,10 @@ Listnode *startNode;
 Listnode *lastNode;
 int listCounter = 0;
 
-void addBlockToList(Block* block, int deepness) {
+void addGraphToList(CFG* graph) {
 	
 	Listnode* ln = malloc(sizeof(Listnode));
-	ln->block = block;
-	ln->deepness = deepness;
+	ln->graph = graph;
 	ln->next = NULL;
 	ln->prev = NULL;
 	ln->nr = listCounter++;

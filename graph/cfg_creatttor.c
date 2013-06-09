@@ -30,20 +30,25 @@ int firstBlock = 0;
 void generateCFG(FILE *cfgStreamPar)
 {	
 	cfgStream = cfgStreamPar;
-	cfg = (CFG*) malloc(sizeof(CFG));
-	initCFG(cfg);
 	
 	struct FUNCTION *currentFunc = root->FuncList;
 
 	while (currentFunc != NULL)
 	{
 		fprintf(cfgStream, "%s\n\n", currentFunc->ID);
+		
+		cfg = (CFG*) malloc(sizeof(CFG));
+		initCFG(cfg);
+		
 		gotoFunction(currentFunc);
+		
+		optimize(cfg);
+		printGraph(cfg, cfgStream);
+		addGraphToList(cfg);
+
 		currentFunc = currentFunc->prev;
 	}
 
-	optimize(cfg);
-	printGraph(cfg, cfgStream);
 }
 
 void gotoDeclaration(struct DECLARATION* decl)

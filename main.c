@@ -49,8 +49,13 @@ int main(int argc, char *argv[])
 		if(!yyparse())
 		{
 			printf("'%s' successfully parsed. Tree in 'tree.txt', symboltable in 'table.txt'\n",argv[1]);
+			
+			//set_timer();		
 			generateOutput(astFile, tableFile);
+			set_timer();			
 			generateCFG(cfaFile); //, lifenessFile);
+			double time = get_timer();
+			printf("EPIC TOTAL TIME: %f\n", time);
 		}
 		/*
 		when error occured, print
