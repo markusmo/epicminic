@@ -69,10 +69,12 @@ void generateLiveliness(FILE *astStreamPar)
 			}
 
 			struct STMT* stmt = currGraph->blocks[i].statements;			
-		
-			while(stmt != NULL) {
+			
+			int countStmts = 0;
+			while(stmt != NULL && countStmts < currGraph->blocks[i].countStmts) {
 				liveStatement(stmt);
-				stmt = stmt->prev;			
+				stmt = stmt->prev;
+				countStmts++;			
 			}
 
 			currentBlockNr++;
