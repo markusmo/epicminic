@@ -50,18 +50,24 @@ void generateLiveliness(FILE *astStreamPar)
 }
 
 void postOrderTraversal(CFG* graph, Block block) {
-	addItemToList(closeList, &block, "");
-	printList(closeList);	
+	char* traversed = (char*) calloc(graph->currentEntries, sizeof(char));
+	postOrderTraversalRec(graph, block, traversed);
+	free(traversed);
+}
+
+void postOrderTraversalRec(CFG* graph, Block block, char* traversed) {
+	traversed[block.nr] = 1;	
 	
-	printf("Actual node: B%d\n", block.nr);
+	
 	int j;
 	for (j = 0; j < graph->currentEntries; j++)
 	{
-		if (graph->matrix[block.nr][j] == 1 && !isDataInList(closeList, &block))
+		if (graph->matrix[block.nr][j] == 1 && !traversed[j])
 		{
-			postOrderTraversal(graph, graph->blocks[j]);
+			postOrderTraversalRec(graph, graph->blocks[j], traversed);
 		}
 	}
+	printf("Actual node: B%d\n", block.nr);
 }
 
 void liveFunction(struct FUNCTION *func)

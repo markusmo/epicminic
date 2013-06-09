@@ -6,6 +6,7 @@
 void generateLiveliness(FILE *astStreamPar);
 
 void postOrderTraversal(CFG* graph, Block block);
+void postOrderTraversalRec(CFG* graph, Block block, char* traversed);
 void liveFunction(struct FUNCTION *func);
 void liveParameter(struct PARAMETER *par);
 void liveExpr(struct EXPR *expr);
