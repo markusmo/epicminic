@@ -1,13 +1,14 @@
-Function name: GLOBAL - function1
+Function name: GLOBAL - main2
 count		Type		Name		Array		Role
-1		int		a		 		param
+1		int		aa		10		param
+2		int		bb		2		param
+3		int		a		 		var
+4		int		b		 		var
+5		float		c		 		var
 
-Function name: GLOBAL - function2
+Function name: GLOBAL - func1 - compound
 count		Type		Name		Array		Role
-1		int		b		 		param
+1		int		a		 		var
 2		int		b		 		var
-
-Function name: GLOBAL - main
-count		Type		Name		Array		Role
-1		int		c		 		var
+3		float		c		 		var
 

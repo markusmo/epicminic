@@ -15,4 +15,7 @@ int main()
 	function1(c);
 
 	return 0;
+
+	c = 3;
+	c = 3 + c;
 }

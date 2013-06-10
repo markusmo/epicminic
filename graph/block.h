@@ -13,5 +13,6 @@ typedef struct Block {
 	int countStmts;
 } Block;
 
+void resetBlockCounter();
 Block createBlock();
 void addStatementToBlock(Block* block, struct STMT* stmt);

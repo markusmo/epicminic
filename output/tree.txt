@@ -1,14 +1,40 @@
-int function1(int a)
+float main2(float aa[10], int bb[2])
 {
-function2(a);
+int a,b;
+float c;
+a=100;
+bb[a-99]=-a*((10>=9)!=1);
+for(i=0;i<100;i=i*(-1))
+a=a-b;
+main();
+return (0.000000);
 }
-float function2(float b)
+int func1()
 {
+var1=10;
+var2=100;
+var3=2.000000;
+var4=11.000000;
+var5[i]=i;
+var6[i]=i*4;
+var7[i+1]=i*2.000000;
+var8[i-1]=i*2.000000;
+var5[j]=i*j;
+var6[j]=-i;
+var6[j]=var1<var3;
+for(j=0;j<=10;j=j+var6[6])
+{
+if (j>0)
+{
+var7[i]=var3*-var1;
+var8[i]=-1-5+6+(8*(20+67)/(-49-3/6*-1));
+}
+while(j<=0)
+i=i+1;
+}
+{
+int a;
 int b;
+float c;
 }
-int main()
-{
-int c;
-function1(c);
-return (0);
 }
