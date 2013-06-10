@@ -83,7 +83,7 @@ void generateLiveliness(FILE *astStreamPar)
 			//set in_set of block i to use_set if block i
 			hashset_union(in_set[i], use_set[i]);
 			//copy in_set to prev_in_set for graph traversal
-			hashset_union(prev_in_set[i], in_set[i]);
+			//hashset_union(prev_in_set[i], in_set[i]);
 		}
 		//while any change to a in_set of any block happened loop
 		//initial change is true
@@ -102,6 +102,7 @@ void generateLiveliness(FILE *astStreamPar)
 				 	prev_in_set[i] = hashset_create();
 					//copy current in set to previous one
 					hashset_union(prev_in_set[i], in_set[i]);
+printf("%d\n", prev_in_set[i]->nitems);
 				}
 			}
 		}
@@ -110,7 +111,7 @@ void generateLiveliness(FILE *astStreamPar)
 		//####################
 		fprintf(astStreamPar, "\tBegin (IN)\t\tEnd(OUT)\n");
 		for(i = 0; i < currGraph->currentEntries; i++)
-		{printf("%d\n", in_set[i]->nitems);
+		{
 			fprintf(astStreamPar, "B%d", currGraph->blocks[i].nr);
 			hashset_print(in_set[i], astStreamPar);
 			fprintf(astStreamPar, "\t\t");
