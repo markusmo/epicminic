@@ -194,7 +194,7 @@ int hashset_equals(hashset_t set, hashset_t other)
                     char* s = other->items[j];
                     if(s != NULL)
                     {
-                        if(strcmp(s,v)==1)
+                        if(strcmp(s,v)==0)
                         {
                             return 0;
                         }
