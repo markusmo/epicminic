@@ -137,7 +137,9 @@ void optimizeRec(CFG* cfg, int node, char* optimized)
 void printGraph(CFG* cfg, FILE* cfgStream)
 {
 	int i, j;
-	for (i = 0; i < cfg->currentEntries; i++)
+
+	// for debugging
+	/*for (i = 0; i < cfg->currentEntries; i++)
 	{
 		for (j = 0; j < cfg->currentEntries; j++)
 		{
@@ -145,7 +147,7 @@ void printGraph(CFG* cfg, FILE* cfgStream)
 		}
 		fprintf(cfgStream, "\n");
 	}
-	fprintf(cfgStream, "\n\n\n");
+	fprintf(cfgStream, "\n\n\n");*/
 
 	char first = 1;
 	setStream(cfgStream);
