@@ -95,6 +95,7 @@ void printCFGStatement(struct STMT *stmt)
 			fprintf(cfgStream, ";\n");
 			break;
 		case eRet:
+			fprintf(cfgStream, "return ");
 			printCFGExpr(stmt->stmt.return_s);
 			fprintf(cfgStream, ";\n");
 			break;

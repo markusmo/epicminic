@@ -18,7 +18,6 @@
 extern struct PROGRAM *root;
 
 FILE* cfgStream;
-CFG *cfg;
 
 int firstBlock = 0;
 List* graphList;
@@ -40,51 +39,63 @@ void generateCFG(FILE *cfgStreamPar)
 	{
 		fprintf(cfgStream, "%s\n\n", currentFunc->ID);
 		
-		cfg = (CFG*) malloc(sizeof(CFG));
+		CFG* cfg = (CFG*) malloc(sizeof(CFG));
 		initCFG(cfg);
 		
-		gotoFunction(currentFunc);
-		
+		gotoFunction(currentFunc, cfg);
+
 		optimize(cfg);
 		printGraph(cfg, cfgStream);
 		addItemToList(graphList, cfg, currentFunc->ID);
-
 		currentFunc = currentFunc->prev;
 	}
-
 }
 
-void gotoDeclaration(struct DECLARATION* decl)
+void printToConsole(CFG* graph)
+{
+	int i, j;
+	for (i = 0; i < graph->currentEntries; i++)
+	{
+		for (j = 0; j < graph->currentEntries; j++)
+		{
+			printf("%d\t", graph->matrix[i][j]);
+		}
+		printf("\n");
+	}
+	printf("\n\n");
+}
+
+void gotoDeclaration(struct DECLARATION* decl, CFG* cfg)
 {
 	struct IDENTIFIER *currIdent = decl->ilist;
 
 	while (currIdent != NULL)
 	{
-		gotoIdentifier(currIdent);
+		gotoIdentifier(currIdent, cfg);
 		currIdent = currIdent->prev;
 	}
 }
 
-void gotoFunction(struct FUNCTION *func)
+void gotoFunction(struct FUNCTION *func, CFG* cfg)
 {
 	struct PARAMETER *currPar = func->ParamList;
 
 	while (currPar != NULL)
 	{
-		gotoParameter(currPar);
+		gotoParameter(currPar, cfg);
 		currPar = currPar->prev;
 	}
 
-	gotoCompound(func->CStmt, 1, NULL);
+	gotoCompound(func->CStmt, 1, NULL, cfg);
 
 }
 
-void gotoParameter(struct PARAMETER *par)
+void gotoParameter(struct PARAMETER *par, CFG* cfg)
 {
-	gotoIdentifier(par->id);	
+	gotoIdentifier(par->id, cfg);	
 }
 
-Block* gotoCompound(struct COMPOUNDSTMT *comp, int functionComp, Block* currBlockP)
+Block* gotoCompound(struct COMPOUNDSTMT *comp, int functionComp, Block* currBlockP, CFG* cfg)
 {	
 	struct DECLARATION *currDecl = comp->DeclList;
 
@@ -97,7 +108,7 @@ Block* gotoCompound(struct COMPOUNDSTMT *comp, int functionComp, Block* currBloc
 
 	while (currDecl != NULL)
 	{
-		gotoDeclaration(currDecl);
+		gotoDeclaration(currDecl, cfg);
 		currDecl = currDecl->prev;
 	}
 
@@ -105,14 +116,14 @@ Block* gotoCompound(struct COMPOUNDSTMT *comp, int functionComp, Block* currBloc
 
 	while (currStmt != NULL)
 	{
-		currBlockP = gotoStatement(currStmt, 0, currBlockP);
+		currBlockP = gotoStatement(currStmt, 0, currBlockP, cfg);
 		currStmt = currStmt->prev;
 	}
 
 	return currBlockP;
 }
 
-Block* gotoStatement(struct STMT *stmt, int isAlreadyDeeper, Block* currBlock)
+Block* gotoStatement(struct STMT *stmt, int isAlreadyDeeper, Block* currBlock, CFG* cfg)
 {
 	Block* returnBlock = currBlock;
 
@@ -121,32 +132,34 @@ Block* gotoStatement(struct STMT *stmt, int isAlreadyDeeper, Block* currBlock)
 	{
 		case eAssign:
 			addStatementToBlock(currBlock, stmt);
-			gotoAssign(stmt->stmt.assign_s);
+			gotoAssign(stmt->stmt.assign_s, cfg);
 			break;
 		case eCall:
 			addStatementToBlock(currBlock, stmt);
-			gotoCall(stmt->stmt.call_s);
+			gotoCall(stmt->stmt.call_s, cfg);
 			break;
 		case eRet:
 			addStatementToBlock(currBlock, stmt);
-			gotoExpr(stmt->stmt.return_s);
+			gotoExpr(stmt->stmt.return_s, cfg);
+			Block temp = createBlock();
+			returnBlock = addBlock(cfg, &temp);
 			break;
 		case eWhile:
-			returnBlock = gotoWhile(stmt->stmt.while_s, currBlock, stmt);
+			returnBlock = gotoWhile(stmt->stmt.while_s, currBlock, stmt, cfg);
 			break;
 		case eDoWhile:
-			returnBlock = gotoDoWhile(stmt->stmt.dowhile_s, currBlock, stmt);
+			returnBlock = gotoDoWhile(stmt->stmt.dowhile_s, currBlock, stmt, cfg);
 			break;
 		case eFor:
-			returnBlock = gotoFor(stmt->stmt.for_s, currBlock, stmt);
+			returnBlock = gotoFor(stmt->stmt.for_s, currBlock, stmt, cfg);
 			break;
 		case eIf:
 			// add Expr of the if to the current block....no idea how to do
 			addStatementToBlock(currBlock, stmt);
-			returnBlock = gotoIf(stmt->stmt.if_s, currBlock);
+			returnBlock = gotoIf(stmt->stmt.if_s, currBlock, cfg);
 			break;
 		case eCompound:
-			returnBlock = gotoCompound(stmt->stmt.compound_s, 0, currBlock);
+			returnBlock = gotoCompound(stmt->stmt.compound_s, 0, currBlock, cfg);
 			break;
 		case eSemi:
 			break;
@@ -155,19 +168,19 @@ Block* gotoStatement(struct STMT *stmt, int isAlreadyDeeper, Block* currBlock)
 	return returnBlock;
 }
 
-void gotoExpr(struct EXPR *expr)
+void gotoExpr(struct EXPR *expr, CFG* cfg)
 {
 	/* expressions need to be switched, because multiple possibilities are available */
 	switch(expr->e_expr)
 	{
 		case eUnop:
-			gotoUnop(expr->expression.unop_expr);
+			gotoUnop(expr->expression.unop_expr, cfg);
 			break;
 		case eBinop:
-			gotoBinop(expr->expression.binop_expr);
+			gotoBinop(expr->expression.binop_expr, cfg);
 			break;
 		case eCallExpr:
-			gotoCall(expr->expression.call_expr);
+			gotoCall(expr->expression.call_expr, cfg);
 			break;
 		case eIntnum:
 			gotoInt(expr->expression.intnum);
@@ -176,62 +189,62 @@ void gotoExpr(struct EXPR *expr)
 			gotoFloat(expr->expression.floatnum);
 			break;
 		case eId:
-			gotoIDs(expr->expression.ID_expr);
+			gotoIDs(expr->expression.ID_expr, cfg);
 			break;
 		case eExpr:
-			gotoExpr(expr->expression.bracket);
+			gotoExpr(expr->expression.bracket, cfg);
 			break;
 	}
 }
 
-void gotoUnop(struct UNOP *un)
+void gotoUnop(struct UNOP *un, CFG* cfg)
 {
-	gotoExpr(un->expr);
+	gotoExpr(un->expr, cfg);
 }
 
-void gotoBinop(struct BINOP *bin)
+void gotoBinop(struct BINOP *bin, CFG* cfg)
 {
-	gotoExpr(bin->expr1);
-	gotoExpr(bin->expr2);
+	gotoExpr(bin->expr1, cfg);
+	gotoExpr(bin->expr2, cfg);
 }
 
-void gotoIDs(struct IDs *ids)
+void gotoIDs(struct IDs *ids, CFG* cfg)
 {
 	if (ids->expr != NULL)
 	{
-		gotoExpr(ids->expr);
+		gotoExpr(ids->expr, cfg);
 	}
 }
 
-void gotoArgument(struct ARGLIST *arg)
+void gotoArgument(struct ARGLIST *arg, CFG* cfg)
 {
-	gotoExpr(arg->expr);
+	gotoExpr(arg->expr, cfg);
 }
 
-void gotoAssign(struct ASSIGN *assign)
+void gotoAssign(struct ASSIGN *assign, CFG* cfg)
 {
 	if (assign->index != NULL)
 	{
-		gotoExpr(assign->index);
+		gotoExpr(assign->index, cfg);
 	}
 
-	gotoExpr(assign->expr);
+	gotoExpr(assign->expr, cfg);
 }
 
-void gotoCall(struct CALL *call)
+void gotoCall(struct CALL *call, CFG* cfg)
 {
 	struct ARGLIST *currArg = call->arg;
 
 	while (currArg != NULL)
 	{
-		gotoArgument(currArg);
+		gotoArgument(currArg, cfg);
 		currArg = currArg->prev;
 	}
 }
 
-Block* gotoWhile(struct WHILEs *whil, Block* currBlock, struct STMT *currStmt)
+Block* gotoWhile(struct WHILEs *whil, Block* currBlock, struct STMT *currStmt, CFG* cfg)
 {
-	gotoExpr(whil->condition);
+	gotoExpr(whil->condition, cfg);
 
 	Block condition = createBlock();
 	Block* conditionP = addBlock(cfg, &condition);
@@ -243,7 +256,7 @@ Block* gotoWhile(struct WHILEs *whil, Block* currBlock, struct STMT *currStmt)
 	addConnection(cfg, currBlock->nr, conditionP->nr);
 	addConnection(cfg, conditionP->nr, bodyP->nr);
 
-	Block* lastBlock = gotoStatement(whil->stmt, 1, bodyP);
+	Block* lastBlock = gotoStatement(whil->stmt, 1, bodyP, cfg);
 	addConnection(cfg, lastBlock->nr, conditionP->nr);
 
 	Block newBlock = createBlock();
@@ -254,16 +267,16 @@ Block* gotoWhile(struct WHILEs *whil, Block* currBlock, struct STMT *currStmt)
 	return addBlock(cfg, &newBlock);
 }
 
-Block* gotoDoWhile(struct DOWHILEs *dowhile, Block* currBlock, struct STMT *currStmt)
+Block* gotoDoWhile(struct DOWHILEs *dowhile, Block* currBlock, struct STMT *currStmt, CFG* cfg)
 {
-	gotoStatement(dowhile->stmt, 1, currBlock);
+	gotoStatement(dowhile->stmt, 1, currBlock, cfg);
 
 	Block body = createBlock();
 	Block* bodyP = addBlock(cfg, &body);
 
 	addConnection(cfg, currBlock->nr, bodyP->nr);
 
-	Block* lastBlock = gotoStatement(dowhile->stmt, 1, bodyP);
+	Block* lastBlock = gotoStatement(dowhile->stmt, 1, bodyP, cfg);
 
 	Block condition = createBlock();
 	Block* conditionP = addBlock(cfg, &condition);
@@ -271,7 +284,7 @@ Block* gotoDoWhile(struct DOWHILEs *dowhile, Block* currBlock, struct STMT *curr
 	//addConnection(cfg, bodyP->nr, conditionP->nr);
 	addConnection(cfg, lastBlock->nr, conditionP->nr);
 
-	gotoExpr(dowhile->condition);
+	gotoExpr(dowhile->condition, cfg);
 
 	Block newBlock = createBlock();
 
@@ -281,11 +294,11 @@ Block* gotoDoWhile(struct DOWHILEs *dowhile, Block* currBlock, struct STMT *curr
 	return addBlock(cfg, &newBlock);
 }
 
-Block* gotoFor(struct FORs *fr, Block* currBlock, struct STMT *currStmt)
+Block* gotoFor(struct FORs *fr, Block* currBlock, struct STMT *currStmt, CFG* cfg)
 {
-	gotoAssign(fr->init);
-	gotoExpr(fr->condition);
-	gotoAssign(fr->next);
+	gotoAssign(fr->init, cfg);
+	gotoExpr(fr->condition, cfg);
+	gotoAssign(fr->next, cfg);
 
 	Block condition = createBlock();
 	Block* conditionP = addBlock(cfg, &condition);
@@ -297,7 +310,7 @@ Block* gotoFor(struct FORs *fr, Block* currBlock, struct STMT *currStmt)
 	addConnection(cfg, currBlock->nr, conditionP->nr);
 	addConnection(cfg, conditionP->nr, bodyP->nr);
 
-	Block* lastBlock = gotoStatement(fr->stmt, 1, bodyP);
+	Block* lastBlock = gotoStatement(fr->stmt, 1, bodyP, cfg);
 	addConnection(cfg, lastBlock->nr, conditionP->nr);
 
 	Block newBlock = createBlock();
@@ -308,19 +321,19 @@ Block* gotoFor(struct FORs *fr, Block* currBlock, struct STMT *currStmt)
 	return addBlock(cfg, &newBlock);
 }
 
-Block* gotoIf(struct IFs *iff, Block* currentBlock)
+Block* gotoIf(struct IFs *iff, Block* currentBlock, CFG* cfg)
 {
 
 	int elseNr = -1;
 	Block* nextBlock2;
 
-	gotoExpr(iff->condition);
+	gotoExpr(iff->condition, cfg);
 	Block ifBlock = createBlock();
 	
 	Block* ifBlockP = addBlock(cfg, &ifBlock);
 	addConnection(cfg, currentBlock->nr, ifBlockP->nr);
 	
-	Block* nextBlock = gotoStatement(iff->if_s, 1, ifBlockP);
+	Block* nextBlock = gotoStatement(iff->if_s, 1, ifBlockP, cfg);
 
 	if (iff->else_s != NULL)
 	{
@@ -329,7 +342,7 @@ Block* gotoIf(struct IFs *iff, Block* currentBlock)
 		Block* elseBlockP = addBlock(cfg, &elseBlock);
 		addConnection(cfg, currentBlock->nr, elseBlockP->nr);
 
-		nextBlock2 = gotoStatement(iff->else_s, 1, elseBlockP);
+		nextBlock2 = gotoStatement(iff->else_s, 1, elseBlockP, cfg);
 
 	}
 
@@ -349,7 +362,7 @@ Block* gotoIf(struct IFs *iff, Block* currentBlock)
 	return addBlock(cfg, &newBlock);
 }
 
-void gotoIdentifier(struct IDENTIFIER* identifier)
+void gotoIdentifier(struct IDENTIFIER* identifier, CFG* cfg)
 {	
 	if (identifier->intnum == 0) {
 		//printf("Identifier id: %s\n", identifier->ID);

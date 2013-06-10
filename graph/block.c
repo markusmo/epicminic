@@ -5,6 +5,11 @@
 
 static blockCounter = 0;
 
+void resetBlockCounter()
+{
+	blockCounter = 0;
+}
+
 Block createBlock()
 {
 	Block b;

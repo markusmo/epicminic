@@ -5,6 +5,7 @@ int function1(int a)
 
 float function2(float b)
 {
+	int b;
 }
 
 int main()
@@ -14,4 +15,7 @@ int main()
 	function1(c);
 
 	return 0;
+
+	c = 3;
+	c = 3 + c;
 }
