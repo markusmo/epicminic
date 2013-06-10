@@ -17,8 +17,8 @@
 
 #include <stdio.h>
 #include "hashset.h"
-#include <stdio.h>
 #include <assert.h>
+#include <string.h>
 
 static const unsigned int prime_1 = 73;
 static const unsigned int prime_2 = 5009;
@@ -151,6 +151,8 @@ void hashset_union(hashset_t set, hashset_t toJoin)
         char* value = toJoin->items[i];
         if(value !=0)
         {
+            char * dest = malloc(strlen(value));
+            strcpy(dest, value);
             hashset_add(set, value);
         }
     }
@@ -173,3 +175,35 @@ void hashset_print(hashset_t set)
 
     printf(" }");
 }
+
+int hashset_equals(hashset_t set, hashset_t other)
+{
+    if(set->nitems == other->nitems)
+    {
+        int len = sizeof(set->items);
+        int lenother = sizeof(other->items);
+        int i;
+        int j;
+        for(i = 0; i < len; i++)
+        {
+            char* v = set->items[i];
+            if(v != NULL)
+            {
+                for(j = 0; j < lenother; j++)
+                {                    
+                    char* s = other->items[j];
+                    if(s != NULL)
+                    {
+                        if(strcmp(s,v)==1)
+                        {
+                            return 0;
+                        }
+                    }
+                } 
+            }
+        }
+        return 1;
+    }
+    return 0;
+}
+

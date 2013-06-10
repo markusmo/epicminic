@@ -1,4 +1,4 @@
-CFLAGS=-std=c99 -pedantic -Wall -Wextra -Werror -ggdb3 -O0
+CFLAGS=-std=c99 -O0
 
 test: test.o hashset.o
 	$(CC) $(CFLAGS) test.o hashset.o -o $@

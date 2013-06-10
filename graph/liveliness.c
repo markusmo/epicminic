@@ -14,7 +14,6 @@
 #include "list.h"
 #endif
 #include "liveliness.h"
-
 #include "../hashset/hashset.h"
 
 extern List* graphList;
@@ -76,46 +75,36 @@ void generateLiveliness(FILE *astStreamPar)
 				stmt = stmt->prev;
 				countStmts++;			
 			}
-
-			currentBlockNr++;
-		}
-
-		for (i = 0; i < currGraph->currentEntries; i++)
-		{
-			if(currGraph->blocks[i].statements == NULL && currGraph->blocks[i].declarations == NULL)
-				continue;
 			
-			printf("Def-set B%d:\n", i);
-			hashset_print(def_set[i]);
-			printf("\n");
-
-			printf("Use-set B%d:\n", i);
-			hashset_print(use_set[i]);
-			printf("\n\n");
+			//set in_set of block i to use_set if block i
+			hashset_union(in_set[i], use_set[i]);
 		}
-
+		//while any change to a in_set of any block happened loop
+		
 		postOrderTraversal(currGraph, currGraph->blocks[0]);			
-
-		temp = temp->next;	
+		
+		temp = temp->next;
 	}
 }
 
-void postOrderTraversal(CFG* graph, Block block) {
+void postOrderTraversal(CFG* graph, Block block) 
+{
 	char* traversed = (char*) calloc(graph->currentEntries, sizeof(char));
 	postOrderTraversalRec(graph, block, traversed);
 	free(traversed);
 }
 
-void postOrderTraversalRec(CFG* graph, Block block, char* traversed) {
-	traversed[block.nr] = 1;	
-	
-	
+void postOrderTraversalRec(CFG* graph, Block block, char* traversed) 
+{
+	traversed[block.nr] = 1;
 	int j;
+
 	for (j = 0; j < graph->currentEntries; j++)
 	{
 		if (graph->matrix[block.nr][j] == 1 && !traversed[j])
 		{
 			postOrderTraversalRec(graph, graph->blocks[j], traversed);
+			
 		}
 	}
 }

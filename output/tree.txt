@@ -1,0 +1,19 @@
+<<<<<<< HEAD
+=======
+int fun(int x, int y)
+{
+int z;
+float c;
+z=x*y;
+c=z*y;
+for(z=0;z<10;z=z+1)
+{
+while(x<10)
+{
+x=c-1;
+}
+z=z-1;
+}
+printf(z);
+}
+>>>>>>> 7855bfd305e12a3eb606680c17c0928ae4acd86e

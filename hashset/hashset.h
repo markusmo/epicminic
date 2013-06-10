@@ -71,6 +71,8 @@ extern "C" {
     void hashset_union(hashset_t set, hashset_t toJoin);
 
     void hashset_print(hashset_t set);
+    
+    int hashset_equals(hashset_t set, hashset_t other);
 
 #ifdef __cplusplus
 }

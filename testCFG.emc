@@ -1,13 +1,13 @@
 int fun(int x, int y) {
 	int z;
-	float x;
+	float c;
 
 	z = x * y;
-	x = z * y;
+	c = z * y;
 
 	for(z = 0; z < 10; z = z + 1) {
 		while (x < 10) {
-			x = x - 1;
+			x = c - 1;
 		} 
 
 		z = z -1;
