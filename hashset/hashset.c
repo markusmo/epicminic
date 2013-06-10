@@ -128,7 +128,7 @@ int hashset_is_member(hashset_t set, char *item)
     size_t ii = set->mask & (prime_1 * ((size_t)item));
 
     while (set->items[ii] != 0) {
-        if (strcpy(set->items[ii], item) == 0) {
+        if (strcmp(set->items[ii], item) == 0) {
             return 1;
         } else {
             ii = set->mask & (ii + prime_2);
@@ -142,10 +142,9 @@ int hashset_is_member(hashset_t set, char *item)
  */
 void hashset_union(hashset_t set, hashset_t toJoin)
 {
-    int len_toJoin = sizeof(set->items);    
     
     int i;
-    for(i = 0;i<=len_toJoin;i++)
+    for(i = 0;i<set->nitems;i++)
     {
         char* value = toJoin->items[i];
         if(value !=0)
@@ -159,11 +158,10 @@ void hashset_union(hashset_t set, hashset_t toJoin)
 
 void hashset_print(hashset_t set, FILE *name)
 {
-    int len = sizeof(set->items);    
     fprintf(name, "{ ");
 
     int i;
-    for(i = 0; i < len; i++)
+    for(i = 0; i < set->nitems; i++)
     {
         char* value = set->items[i];
         if(value != NULL)
@@ -179,11 +177,10 @@ int hashset_equals(hashset_t set, hashset_t other)
 {
     if(set->nitems == other->nitems)
     {
-        int len = sizeof(set->items);
-        int lenother = sizeof(other->items);
         int i;
         int j;
-        for(i = 0; i < len; i++)
+
+        for(i = 0; i < set->nitems; i++)
         {
             char* v = set->items[i];
             if(!hashset_is_member(other, v))
@@ -197,12 +194,11 @@ int hashset_equals(hashset_t set, hashset_t other)
 }
 hashset_t hashset_substraction(hashset_t set, hashset_t substrahend)
 {
-    int len = sizeof(substrahend->items);    
     hashset_t ret = hashset_create();
     hashset_union(ret,set);
     int i;
     
-    for(i = 0; i < len; i++)
+    for(i = 0; i < set->nitems; i++)
     {
         char* value = substrahend->items[i];
         if(value != NULL)

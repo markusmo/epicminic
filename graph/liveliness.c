@@ -62,7 +62,7 @@ void generateLiveliness(FILE *astStreamPar)
 				continue;
 			}
 
-			currentBlockNr = i;
+			currentBlockNr = currGraph->blocks[i].nr;
 
 			struct DECLARATION* decl = currGraph->blocks[i].declarations;
 			
@@ -110,7 +110,7 @@ void generateLiveliness(FILE *astStreamPar)
 		//####################
 		fprintf(astStreamPar, "\tBegin (IN)\t\tEnd(OUT)\n");
 		for(i = 0; i < currGraph->currentEntries; i++)
-		{
+		{printf("%d\n", in_set[i]->nitems);
 			fprintf(astStreamPar, "B%d", currGraph->blocks[i].nr);
 			hashset_print(in_set[i], astStreamPar);
 			fprintf(astStreamPar, "\t\t");
