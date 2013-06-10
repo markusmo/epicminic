@@ -158,10 +158,10 @@ void hashset_union(hashset_t set, hashset_t toJoin)
     }
 }
 
-void hashset_print(hashset_t set)
+void hashset_print(hashset_t set, FILE *name)
 {
     int len = sizeof(set->items);    
-    printf("{ ");
+    fprintf(name, "{ ");
 
     int i;
     for(i = 0; i < len; i++)
@@ -169,11 +169,11 @@ void hashset_print(hashset_t set)
         char* value = set->items[i];
         if(value != NULL)
         {
-            printf("%s, ", value);
+            fprintf(name, "%s, ", value);
         }
     }
 
-    printf(" }");
+    fprintf(name, " }");
 }
 
 int hashset_equals(hashset_t set, hashset_t other)

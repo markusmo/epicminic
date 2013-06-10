@@ -70,8 +70,14 @@ extern "C" {
      */
     void hashset_union(hashset_t set, hashset_t toJoin);
 
-    void hashset_print(hashset_t set);
-    
+    void hashset_print(hashset_t set, FILE *name);
+   
+    /*
+     * checks if two sets have equal entries
+     * equal --> strings are equal
+     * 
+     * returns non zero if true
+     */
     int hashset_equals(hashset_t set, hashset_t other);
 
 #ifdef __cplusplus
