@@ -1,4 +1,10 @@
+<<<<<<< HEAD
 Function name: GLOBAL
+=======
+<<<<<<< HEAD
+=======
+Function name: GLOBAL - main2
+>>>>>>> 854b07d01e2556c5357675ba47fa2e229f2e8efb
 count		Type		Name		Array		Role
 1		int		a		 		var
 2		int		b		 		var
@@ -50,6 +56,7 @@ count		Type		Name		Array		Role
 2		int		b		 		var
 3		float		c		 		var
 
+<<<<<<< HEAD
 Function name: GLOBAL - main2
 count		Type		Name		Array		Role
 1		float		aa		10		param
@@ -81,3 +88,6 @@ count		Type		Name		Array		Role
 1		int		d		 		var
 2		int		two		1		var
 
+=======
+>>>>>>> 18928a8ee7b4f61d7c34457c2e0be76e430a1621
+>>>>>>> 854b07d01e2556c5357675ba47fa2e229f2e8efb

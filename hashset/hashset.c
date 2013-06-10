@@ -112,7 +112,7 @@ int hashset_remove(hashset_t set, char *item)
     size_t ii = set->mask & (prime_1 * ((size_t)item));
 
     while (set->items[ii] != 0) {
-        if (set->items[ii] == item) {
+        if (strcmp(set->items[ii],item) == 0) {
             set->items[ii] = (char*)1;
             set->nitems--;
             return 1;
@@ -128,7 +128,7 @@ int hashset_is_member(hashset_t set, char *item)
     size_t ii = set->mask & (prime_1 * ((size_t)item));
 
     while (set->items[ii] != 0) {
-        if (set->items[ii] == item) {
+        if (strcpy(set->items[ii], item) == 0) {
             return 1;
         } else {
             ii = set->mask & (ii + prime_2);
@@ -142,7 +142,6 @@ int hashset_is_member(hashset_t set, char *item)
  */
 void hashset_union(hashset_t set, hashset_t toJoin)
 {
-
     int len_toJoin = sizeof(set->items);    
     
     int i;
@@ -187,23 +186,41 @@ int hashset_equals(hashset_t set, hashset_t other)
         for(i = 0; i < len; i++)
         {
             char* v = set->items[i];
-            if(v != NULL)
-            {
-                for(j = 0; j < lenother; j++)
-                {                    
-                    char* s = other->items[j];
-                    if(s != NULL)
-                    {
-                        if(strcmp(s,v)==0)
-                        {
-                            return 0;
-                        }
-                    }
-                } 
+            if(!hashset_is_member(other, v))
+            {  
+                return 0;
             }
         }
         return 1;
     }
     return 0;
+}
+hashset_t hashset_substraction(hashset_t set, hashset_t substrahend)
+{
+    int len = sizeof(substrahend->items);    
+    hashset_t ret = hashset_create();
+    hashset_union(ret,set);
+    int i;
+    
+    for(i = 0; i < len; i++)
+    {
+        char* value = substrahend->items[i];
+        if(value != NULL)
+        {
+            if(hashset_is_member(ret,value))
+            {
+                hashset_remove(ret, value);
+            }
+        }
+    }
+    return ret;
+}
+
+hashset_t hashset_addition(hashset_t set, hashset_t add)
+{
+    hashset_t ret = hashset_create();
+    hashset_union(ret,set);
+    hashset_union(ret,add);
+    return ret;
 }
 

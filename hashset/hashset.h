@@ -65,10 +65,21 @@ extern "C" {
      */
     int hashset_is_member(hashset_t set, char *item);
 
+    /*
+     * Added by Stefan Dunst, Michael Faisst, Markus Mohanty
+     */
+
     /* peforms a union on two hashsets, adds to set
-     *  added by Markus Mohanty
      */
     void hashset_union(hashset_t set, hashset_t toJoin);
+
+    /* subtracts set from substrahend
+     *
+     * returns set MINUS substrahend
+     */
+    hashset_t hashset_substraction(hashset_t set, hashset_t substrahend);
+
+    hashset_t hashset_addition(hashset_t set, hashset_t add);
 
     void hashset_print(hashset_t set, FILE *name);
    

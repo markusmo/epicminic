@@ -1,3 +1,10 @@
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+float main2(float aa[10], int bb[2])
+{
+>>>>>>> 854b07d01e2556c5357675ba47fa2e229f2e8efb
 int a,b;
 float c[10];
 int var1,var2;
@@ -71,6 +78,7 @@ int b;
 float c;
 }
 }
+<<<<<<< HEAD
 float main2(float aa[10], int bb[2])
 {
 int a,b;
@@ -108,3 +116,6 @@ one[d]=c;
 }
 return (one[a]);
 }
+=======
+>>>>>>> 18928a8ee7b4f61d7c34457c2e0be76e430a1621
+>>>>>>> 854b07d01e2556c5357675ba47fa2e229f2e8efb
