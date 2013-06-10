@@ -55,10 +55,11 @@ void generateLiveliness(FILE *astStreamPar)
 		// initialize
 		
 		for(i = 0; i < currGraph->currentEntries; i++) {
-			if(currGraph->blocks[i].statements == NULL && currGraph->blocks[i].declarations == NULL)
+			if(currGraph->blocks[i].statements == NULL && currGraph->blocks[i].declarations == NULL) {
 				continue;
+			}
 
-			currentBlockNr = currGraph->blocks[i].nr;
+			currentBlockNr = i;
 
 			struct DECLARATION* decl = currGraph->blocks[i].declarations;
 			
@@ -74,8 +75,8 @@ void generateLiveliness(FILE *astStreamPar)
 				liveStatement(stmt);
 				stmt = stmt->prev;
 				countStmts++;			
-			}
-			
+			}			
+
 			//set in_set of block i to use_set if block i
 			hashset_union(in_set[i], use_set[i]);
 		}
@@ -230,6 +231,7 @@ void liveDeclaration(struct DECLARATION* decl) {
 
 	while (currIdent != NULL)
 	{
+		printf("%d -> %p -> %s\n", currentBlockNr, def_set[currentBlockNr], currIdent->ID);
 		hashset_add(def_set[currentBlockNr], currIdent->ID);
 		currIdent = currIdent->prev;
 	}

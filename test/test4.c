@@ -5,6 +5,7 @@ int function1(int a)
 
 float function2(float b)
 {
+	int b;
 }
 
 int main()

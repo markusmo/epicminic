@@ -1,19 +1,14 @@
-<<<<<<< HEAD
-=======
-int fun(int x, int y)
+int function1(int a)
 {
-int z;
-float c;
-z=x*y;
-c=z*y;
-for(z=0;z<10;z=z+1)
+function2(a);
+}
+float function2(float b)
 {
-while(x<10)
+int b;
+}
+int main()
 {
-x=c-1;
+int c;
+function1(c);
+return (0);
 }
-z=z-1;
-}
-printf(z);
-}
->>>>>>> 7855bfd305e12a3eb606680c17c0928ae4acd86e

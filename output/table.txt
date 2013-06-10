@@ -1,10 +1,13 @@
-<<<<<<< HEAD
-=======
-Function name: GLOBAL - fun
+Function name: GLOBAL - function1
 count		Type		Name		Array		Role
-1		int		x		 		param
-2		int		y		 		param
-3		int		z		 		var
-4		float		c		 		var
+1		int		a		 		param
 
->>>>>>> 7855bfd305e12a3eb606680c17c0928ae4acd86e
+Function name: GLOBAL - function2
+count		Type		Name		Array		Role
+1		int		b		 		param
+2		int		b		 		var
+
+Function name: GLOBAL - main
+count		Type		Name		Array		Role
+1		int		c		 		var
+
