@@ -111,7 +111,7 @@ int hashset_remove(hashset_t set, char *item)
 {
     size_t ii = set->mask & (prime_1 * ((size_t)item));
 
-    while (set->items[ii] != 0) {
+    while (set->items[ii] != NULL && set->items[ii] != 1) {
         if (strcmp(set->items[ii],item) == 0) {
             set->items[ii] = (char*)1;
             set->nitems--;
@@ -127,7 +127,7 @@ int hashset_is_member(hashset_t set, char *item)
 {
     size_t ii = set->mask & (prime_1 * ((size_t)item));
 
-    while (set->items[ii] != 0) {
+    while (set->items[ii] != NULL && set->items[ii] != 1) {
         if (strcmp(set->items[ii], item) == 0) {
             return 1;
         } else {
@@ -144,10 +144,10 @@ void hashset_union(hashset_t set, hashset_t toJoin)
 {
     
     int i;
-    for(i = 0;i<set->nitems;i++)
+    for(i = 0;i < toJoin->nitems;i++)
     {
         char* value = toJoin->items[i];
-        if(value !=0)
+        if(value != 0 && value != 1)
         {
             char * dest = malloc(strlen(value));
             strcpy(dest, value);
@@ -198,7 +198,7 @@ hashset_t hashset_substraction(hashset_t set, hashset_t substrahend)
     hashset_union(ret,set);
     int i;
     
-    for(i = 0; i < set->nitems; i++)
+    for(i = 0; i < substrahend->nitems; i++)
     {
         char* value = substrahend->items[i];
         if(value != NULL)

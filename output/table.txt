@@ -1,7 +1,0 @@
-Function name: GLOBAL - fun
-count		Type		Name		Array		Role
-1		int		x		 		param
-2		int		y		 		param
-3		int		z		 		var
-4		float		c		 		var
-

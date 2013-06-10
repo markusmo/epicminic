@@ -33,7 +33,6 @@ Block* addBlock(CFG* cfg, Block* block)
 
 void addConnection(CFG* cfg, int start, int end)
 {
-	printf("added conn: %d -> %d\n", start, end);
 	cfg->matrix[start][end] = 1;
 }
 
