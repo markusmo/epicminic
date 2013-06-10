@@ -18,6 +18,7 @@
 
 extern List* graphList;
 
+hashset_t* prev_in_set;
 hashset_t* in_set;
 hashset_t* use_set;
 hashset_t* def_set;
@@ -38,6 +39,7 @@ void generateLiveliness(FILE *astStreamPar)
 		CFG* currGraph = (CFG*) temp->data;
 		fprintf(astStreamPar, "%s\n\n", temp->funcName);
 
+		prev_in_set = (hashset_t*) calloc(currGraph->currentEntries, sizeof(hashset_t));
 		in_set = (hashset_t*) calloc(currGraph->currentEntries, sizeof(hashset_t));
 		use_set = (hashset_t*) calloc(currGraph->currentEntries, sizeof(hashset_t));
 		def_set = (hashset_t*) calloc(currGraph->currentEntries, sizeof(hashset_t));
@@ -46,6 +48,7 @@ void generateLiveliness(FILE *astStreamPar)
 		int i;
 		for (i = 0; i < currGraph->currentEntries; i++)
 		{
+			prev_in_set[i] = hashset_create();
 			in_set[i] = hashset_create();
 			use_set[i] = hashset_create();
 			def_set[i] = hashset_create();
@@ -78,12 +81,58 @@ void generateLiveliness(FILE *astStreamPar)
 			
 			//set in_set of block i to use_set if block i
 			hashset_union(in_set[i], use_set[i]);
+			//copy in_set to prev_in_set for graph traversal
+			hashset_union(prev_in_set[i], in_set[i]);
 		}
 		//while any change to a in_set of any block happened loop
+		//initial change is true
+		int changes = 1;
+		while(changes > 0)
+		{
+			postOrderTraversal(currGraph,currGraph->blocks[0]);
+			changes = 0;
+			for(i = 0; i < currGraph->currentEntries; i++)
+			{
+				if(hashset_equals(in_set[i], prev_in_set[i]) == 0)
+				{
+					changes++;
+					//reset previous in set
+					hashset_destroy(prev_in_set[i]);
+				 	prev_in_set[i] = hashset_create();
+					//copy current in set to previous one
+					hashset_union(prev_in_set[i], in_set[i]);
+				}
+			}
+		}
 		
-		postOrderTraversal(currGraph, currGraph->blocks[0]);			
-		
+		//print in_set and out_set
+		//####################
+		fprintf(astStreamPar, "\tBegin (IN)\t\tEnd(OUT)\n");
+		for(i = 0; i < currGraph->currentEntries; i++)
+		{
+			fprintf(astStreamPar, "B%d", currGraph->blocks[i].nr);
+			hashset_print(in_set[i], astStreamPar);
+			fprintf(astStreamPar, "\t\t");
+			hashset_print(out_set[i], astStreamPar);
+			fprintf(astStreamPar, "\n");
+		}
+
 		temp = temp->next;
+		
+		//free!
+		for (i = 0; i < currGraph->currentEntries; i++)
+		{
+			hashset_destroy(prev_in_set[i]);
+			hashset_destroy(in_set[i]);
+			hashset_destroy(use_set[i]);
+			hashset_destroy(def_set[i]);
+			hashset_destroy(out_set[i]);
+		}
+		free(prev_in_set);
+		free(in_set);
+		free(use_set);
+		free(def_set);
+		free(out_set);
 	}
 }
 
@@ -96,15 +145,26 @@ void postOrderTraversal(CFG* graph, Block block)
 
 void postOrderTraversalRec(CFG* graph, Block block, char* traversed) 
 {
-	traversed[block.nr] = 1;
+	int blockNr = block.nr;
+	traversed[blockNr] = 1;
 	int j;
 
 	for (j = 0; j < graph->currentEntries; j++)
 	{
-		if (graph->matrix[block.nr][j] == 1 && !traversed[j])
+		if (graph->matrix[blockNr][j] == 1 && !traversed[j])
 		{
 			postOrderTraversalRec(graph, graph->blocks[j], traversed);
-			
+			//out_set of block is all in_sets of the blocks parent
+			int num;
+			for(num = j; num < graph->currentEntries; num ++)
+			{
+				hashset_union(out_set[blockNr],in_set[num]);
+			}
+			//new in_set = use_set UNION (out_set without def_set)
+			hashset_t out_min_def = hashset_substraction(out_set[blockNr], def_set[blockNr]);
+			hashset_t new_in = hashset_addition(use_set[blockNr],out_min_def);
+			hashset_destroy(in_set[blockNr]);
+			in_set[blockNr] = new_in;
 		}
 	}
 }
