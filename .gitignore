@@ -16,3 +16,4 @@ epic_parser
 *.exe
 *.out
 *.app
+output/*.txt

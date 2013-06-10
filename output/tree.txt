@@ -1,3 +1,5 @@
+<<<<<<< HEAD
+=======
 int fun(int x, int y)
 {
 int z;
@@ -14,3 +16,4 @@ z=z-1;
 }
 printf(z);
 }
+>>>>>>> 7855bfd305e12a3eb606680c17c0928ae4acd86e
